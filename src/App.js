@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Volume2, Star, ArrowLeft, ArrowRight, Home, Trophy, Heart } from 'lucide-react';
+import axios from 'axios';
 
 const VietnameseLearningApp = () => {
   const [currentLesson, setCurrentLesson] = useState(0);
@@ -58,14 +59,18 @@ const VietnameseLearningApp = () => {
   ];
 
   const playSound = (text) => {
-    if ('speechSynthesis' in window) {
+  /*  if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'vi-VN';
       utterance.rate = 0.8;
       speechSynthesis.speak(utterance);
-    }
+    }*/
+    // eslint-disable-next-line no-undef
+   // setText(text);
+    window.responsiveVoice.speak(text, 'Vietnamese Female', { rate: 1 });
   };
 
+  
   const generateQuizOptions = (correctWord) => {
     const lesson = lessons[currentLesson];
     const otherWords = lesson.words.filter(w => w.vietnamese !== correctWord.vietnamese);
