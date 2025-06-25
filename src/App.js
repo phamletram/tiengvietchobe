@@ -177,7 +177,40 @@ const VietnameseLearningApp = () => {
           { vietnamese: "Quýt", english: "Tangerine",  image: "🍊"}
         ]
 
-      }
+      },
+      {
+        title: "Phương tiện giao thông",
+        icon: "🚗",
+        words: [
+          { vietnamese: "Xe đạp", english: "Bicycle",  image: "🚲" },
+          { vietnamese: "Xe máy", english: "Motorbike",  image: "🏍️" },
+          { vietnamese: "Ô tô", english: "Car",  image: "🚗" },
+          { vietnamese: "Xe buýt", english: "Bus",  image: "🚌" },
+          { vietnamese: "Tàu hỏa", english: "Train",  image: "🚆" },
+          { vietnamese: "Máy bay", english: "Airplane",  image: "✈️" },
+          { vietnamese: "Tàu thủy", english: "Boat",  image: "⛵" },
+          { vietnamese: "Xe tải", english: "Truck",  image: "🚚" },
+          { vietnamese: "Xe cứu hỏa", english: "Fire truck",  image: "🚒" },
+          { vietnamese: "Xe cảnh sát", english: "Police car",  image: "🚓" },
+          { vietnamese: "Xe taxi", english: "Taxi",  image: "🚕" },
+          { vietnamese: "Xe lửa", english: "Train",  image: "🚂" },
+          { vietnamese: "Xe điện", english: "Tram",  image: "🚋" },
+        ]},
+    {
+      title: "Hình khối",
+      icon: "🔷",
+      words: [
+        { vietnamese: "Hình vuông", english: "Square",  image: "🔲" },
+        { vietnamese: "Hình tròn", english: "Circle",  image: "🔵" },
+        { vietnamese: "Hình tam giác", english: "Triangle",  image: "🔺" },
+        { vietnamese: "Hình chữ nhật", english: "Rectangle",  image: "🟥" },
+        
+        { vietnamese: "Hình thoi", english: "Diamond",  image: "🔸" },
+
+        { vietnamese: "Hình trái tim", english: "Heart",  image: "❤️" },
+        { vietnamese: "Hình sao", english: "Star",  image: "⭐" },
+        
+      ]}
 
 
         ];
