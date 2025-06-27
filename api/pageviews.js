@@ -3,10 +3,11 @@
 import { BetaAnalyticsDataClient } from '@google-analytics/data';
 import { readFileSync } from 'fs';
 
+
 const credentials = {
-    client_email:  import.meta.env.GOOGLE_SERVICE_ACCOUNT_EMAIL, // Lấy từ biến môi trường
-    private_key: import.meta.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'), // Xử lý ký tự xuống dòng
-    project_id: import.meta.env.GOOGLE_PROJECT_ID, 
+    client_email:  process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL, // Lấy từ biến môi trường
+    private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'), // Xử lý ký tự xuống dòng
+    project_id: process.env.GOOGLE_PROJECT_ID, 
   };
 
   const analyticsDataClient = new BetaAnalyticsDataClient({
@@ -14,7 +15,7 @@ const credentials = {
 });
 
 // Thay thế bằng ID tài sản GA4 của bạn (ví dụ: 'properties/123456789')
-const propertyId = 'properties/' + import.meta.env.GA4_PROPERTY_ID; // Lấy từ biến môi trường
+const propertyId = 'properties/' + process.env.GA4_PROPERTY_ID; // Lấy từ biến môi trường
 
 export default async function handler(req, res) {
   try {
@@ -42,6 +43,6 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('Lỗi khi lấy dữ liệu Google Analytics:', error);
-    res.status(500).json({ error: 'Không thể lấy số lượt xem' });
+    res.status(500).json({ error: error });
   }
 }
