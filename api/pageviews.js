@@ -25,13 +25,13 @@ export default async function handler(req, res) {
       property: propertyId,
       dateRanges: [
         {
-          startDate: '30daysAgo', // Hoặc '2020-01-01' để lấy toàn bộ lịch sử
+          startDate: '2026-01-01', // Hoặc '2020-01-01' để lấy toàn bộ lịch sử
           endDate: 'today',
         },
       ],
       metrics: [
         {
-          name: 'screenPageViews', // Đây là số lượt xem trang/màn hình
+          name: 'screenPageViews',
         },
       ],
     });
