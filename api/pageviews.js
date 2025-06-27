@@ -5,9 +5,9 @@ import { readFileSync } from 'fs';
 
 
 const credentials = {
-    client_email:  process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL, // Lấy từ biến môi trường
-    private_key: process.env.GOOGLE_PRIVATE_KEY, // Xử lý ký tự xuống dòng
-    project_id: process.env.GOOGLE_PROJECT_ID, 
+    client_email:  process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL ?? import.meta.env.GOOGLE_SERVICE_ACCOUNT_EMAIL, 
+    private_key: process.env.GOOGLE_PRIVATE_KEY ? process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n') : import.meta.env.GOOGLE_PRIVATE_KEY ? import.meta.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n') : '',
+    project_id: process.env.GOOGLE_PROJECT_ID ?? import.meta.env.GOOGLE_PROJECT_ID,
   };
 
   const analyticsDataClient = new BetaAnalyticsDataClient({
@@ -15,9 +15,11 @@ const credentials = {
 });
 
 // Thay thế bằng ID tài sản GA4 của bạn (ví dụ: 'properties/123456789')
-const propertyId = 'properties/' + process.env.GA4_PROPERTY_ID; // Lấy từ biến môi trường
+const propertyId = 'properties/' + process.env.GA4_PROPERTY_ID ?? import.meta.env.GA4_PROPERTY_ID; // Lấy từ biến môi trường
 
 export default async function handler(req, res) {
+
+  
   try {
     const [response] = await analyticsDataClient.runReport({
       property: propertyId,
