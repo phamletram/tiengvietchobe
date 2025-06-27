@@ -3,22 +3,45 @@
 import { BetaAnalyticsDataClient } from '@google-analytics/data';
 import { readFileSync } from 'fs';
 
-const credentials = JSON.parse(readFileSync('./zippy-aurora-464007-e0-18ffa172ea4e.json', 'utf-8'));
+const credentials = {
+    client_email:  import.meta.env.GOOGLE_SERVICE_ACCOUNT_EMAIL, // Lấy từ biến môi trường
+    private_key: import.meta.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'), // Xử lý ký tự xuống dòng
+    project_id: import.meta.env.GOOGLE_PROJECT_ID, 
+  };
 
-const analyticsDataClient = new BetaAnalyticsDataClient({ credentials });
+  const analyticsDataClient = new BetaAnalyticsDataClient({
+    credentials,
+});
+
+// Thay thế bằng ID tài sản GA4 của bạn (ví dụ: 'properties/123456789')
+const propertyId = 'properties/' + import.meta.env.GA4_PROPERTY_ID; // Lấy từ biến môi trường
 
 export default async function handler(req, res) {
   try {
     const [response] = await analyticsDataClient.runReport({
-      property: 'properties/494826522', // ví dụ: properties/123456789
-      dateRanges: [{ startDate: '2026-01-01', endDate: 'today' }],
-      metrics: [{ name: 'screenPageViews' }],
+      property: propertyId,
+      dateRanges: [
+        {
+          startDate: '30daysAgo', // Hoặc '2020-01-01' để lấy toàn bộ lịch sử
+          endDate: 'today',
+        },
+      ],
+      metrics: [
+        {
+          name: 'screenPageViews', // Đây là số lượt xem trang/màn hình
+        },
+      ],
     });
 
-    const totalViews = response.rows?.[0]?.metricValues?.[0]?.value || '0';
-    res.status(200).json({ views: totalViews });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Failed to fetch GA data' });
+    let totalPageViews = 0;
+    if (response.rows && response.rows.length > 0) {
+      totalPageViews = parseInt(response.rows[0].metricValues[0].value);
+    }
+
+    res.status(200).json({ pageViews: totalPageViews });
+
+  } catch (error) {
+    console.error('Lỗi khi lấy dữ liệu Google Analytics:', error);
+    res.status(500).json({ error: 'Không thể lấy số lượt xem' });
   }
 }
