@@ -6,7 +6,7 @@ import { readFileSync } from 'fs';
 
 const credentials = {
     client_email:  process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL, // Lấy từ biến môi trường
-    private_key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'), // Xử lý ký tự xuống dòng
+    private_key: process.env.GOOGLE_PRIVATE_KEY, // Xử lý ký tự xuống dòng
     project_id: process.env.GOOGLE_PROJECT_ID, 
   };
 
