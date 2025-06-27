@@ -1,18 +1,15 @@
-// src/components/PageCounter.js
 import { useEffect, useState } from 'react';
 
 export default function PageCounter() {
-  const [count, setCount] = useState(null);
+  const [views, setViews] = useState(null);
 
   useEffect(() => {
-    fetch('https://phamtram.goatcounter.com/counter/.json')
+    fetch('/api/pageviews')
       .then((res) => res.json())
-      .then((data) => setCount(data.count));
+      .then((data) => setViews(data.views));
   }, []);
 
   return (
-    
-      <span className="text-xl font-semibold"> Lượt xem: {count ?? '...'}</span>
-   
+    <span className="text-xl font-semibold"> Lượt xem: {views ?? '...'}</span>
   );
 }

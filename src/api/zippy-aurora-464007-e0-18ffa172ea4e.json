@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "zippy-aurora-464007-e0",
+  "private_key_id": "18ffa172ea4e84d10bd50874b51b597edb4d7e98",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCpFz+Pb7yMzKyI\nSmDeB4s8VBKF8XmX+ssRhcjw9Iu7ij80L3FIGrloWBoeGt54Jz6sEdW9Eu4Z9M3p\nn6L/03mBNtUtNpyfAQnfXlVP56cooxt6FuC9hDLjHaIXWVnrXgdS+jIXcON6n4I7\nFGnoJ06Vg4VEcol/hb9JIm8mTZuwISokbc2IBmCSznkKxHNcJL/R6h+0VK6CGpPe\nhOjLwOxyPIRqVK1Pa+GgKX+BwWld8nVDmR8JphyYuDmB/D1Ga8kqkJRAcjveBCxw\nTwOQSI/dYvKG0udr7hbastycD9C6btoIdgVnl7DRPR++aaAfu9SN6jP3asWK7Qlv\n6K7GzODXAgMBAAECggEAHyDxiZV3b7BKXvjaZmWbI2sS0efHi8wW0E4B1SIgC1GD\nGzdUsoKA+Y2mmT43EIWhCwppf9pZTRv9QHIsDs6+wqP2kNFJ+he12pJCQGiUJG4K\no+pMS3dn6tnMumGvpR31WThIOnqE1lFBJ2E1shBybiH9ScGQQJK9yVf2gGWvMLhN\nSRqP2rGi5Bcdu10RkFSFEIee0TX97lbnPYeEOcWo0YfzTgTyX1/OKKptc5IDwfE6\n+JRwNQrFXhwdCOtR2IOZVv89FFeusEbr/kqM/f9hou5AFPL/3kPBvTyrt7JnOzzT\nAFreiFqdSptCTqwl2VN5h27Kc0NUozqEEKYTFKVlgQKBgQDmeupIYIThNY4mh9o4\nCjQtzl7JYZmkEzFqxmDhh1PGM18LQS4Z/B5+aBMx7m+AaMWiuz1sfZ/ggGYNhcI3\nqvDQ7QvB3DvhVvjGTsw70V5DBtWV4cwJsLPC85sdIaAITykDxJ4+4nihBkk9L06r\naK+K1Xb3q2PLx2BUiEwKnIYDFwKBgQC70DgnPHr+Bc9havFBrVjJaf5P9hLsorVa\nprvJnyifZgoJEIgxarlAKAMpWw9iIwytqLqRxouP/r4bU//o4ZOWDNTgkwECiSHX\nn6SIYECEraVA6G+aoheM+vc4mzdtp4K6jMti5RbLRh0iqUd2B/fWJVYQDjOULfTn\nbBi7cpmoQQKBgQDGFHUtZuZMtz5IFxGQgBSAGZCU+nCU9nnODlhM+4UgHh5dCdOZ\nOXjron58tzLU5TaVuN39U6oHw9HxZTeZqCv3IwKrxZ8g9yIvLKGR90pPyJvfiINX\nAKo9ridtTey/t2jEeEKYQQLzQPfIwdOWtQ3I/9SS3pWSGPPNMqZHqGX0WQKBgQCH\nsN7xEhQ2NRJoarBVaB1On6KaOMnhZ4ipLu9bsv7RcxJrDCOpuFaREJeAKIcLuxDs\n4ouwyIaKiVzmN6EbquZLMYgXnH3NTDBELdXcpdXXRfGv3H7NdLCZLbSxlArO0Yh0\nqUZEdAks4cIpCa5Ui1s2v5DXVrtTIoTfMk0IGLsFQQKBgQCIKC+fge5U4z4cCs4h\nM65TzHmJRwpNJrYbqSCdf3rqXQvFyv46PWlH6i0KY/ZETBkbQRwpHm0cFVqL0Vb7\nqwt4Ko0cSktLwfchuk4vyDM0FwFCfvMtx+b8BwWJURklElAtTH3Exp1zywDioY9u\nIG4R7iqDl8izfb6lSS31gnMQGg==\n-----END PRIVATE KEY-----\n",
+  "client_email": "tiengvietchobe@zippy-aurora-464007-e0.iam.gserviceaccount.com",
+  "client_id": "111804545771250207868",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/tiengvietchobe%40zippy-aurora-464007-e0.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
