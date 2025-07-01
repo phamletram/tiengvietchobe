@@ -1,5 +1,5 @@
 // components/DragDropMatchGame.js
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Home, RefreshCcw, Clock, Lightbulb, Trophy, Star, Volume2, VolumeX } from 'lucide-react';
 import { lessons } from '../data/lessons.js';
 
@@ -53,45 +53,48 @@ const GameScreen = ({ setGameState }) => {
   const [streak, setStreak] = useState(0);
   const [bestScore, setBestScore] = useState(0);
 
-  // Sound effects
+  const audioCtxRef = useRef(null);
+
+  // Khởi tạo AudioContext duy nhất
+  if (!audioCtxRef.current && typeof window !== 'undefined') {
+    audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
+  }
+
   const playSound = useCallback((type) => {
-    if (!soundEnabled) return;
-    
-    try {
-      const audio = new Audio();
-      
-      // Create simple beep sounds using Web Audio API
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      switch (type) {
-        case 'correct':
-          oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-          oscillator.type = 'sine';
-          break;
-        case 'incorrect':
-          oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
-          oscillator.type = 'sawtooth';
-          break;
-        case 'flip':
-          oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
-          oscillator.type = 'square';
-          break;
-      }
-      
-      gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
-      
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 0.2);
-      
-    } catch (error) {
-      console.log('Audio not supported:', error);
+    if (!soundEnabled || !audioCtxRef.current) return;
+
+    const audioContext = audioCtxRef.current;
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    switch (type) {
+      case 'correct':
+        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+        oscillator.type = 'sine';
+        break;
+      case 'incorrect':
+        oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+        oscillator.type = 'sawtooth';
+        break;
+      case 'flip':
+        oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+        oscillator.type = 'square';
+        break;
     }
+
+    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.2);
+
+    oscillator.onended = () => {
+      oscillator.disconnect();
+      gainNode.disconnect();
+    };
   }, [soundEnabled]);
 
   // Initialize game with current lesson
