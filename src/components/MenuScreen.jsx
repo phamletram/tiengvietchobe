@@ -98,10 +98,7 @@ const MenuScreen = ({
             <Trophy className="w-6 h-6 mr-2 text-yellow-300" />
             <span className="text-xl font-semibold">Điểm: {score}</span>
           </div>
-          <div className="flex items-center bg-white bg-opacity-20 rounded-full px-5 py-2 shadow-md">
-            <Zap className="w-6 h-6 mr-2 text-yellow-300"  />
-            <span className="text-xl font-semibold">{lives} cơ hội!</span>
-          </div>
+          
           <div className="flex items-center bg-white bg-opacity-20 rounded-full px-5 py-2 shadow-md">
             <PageCounter />
           </div>

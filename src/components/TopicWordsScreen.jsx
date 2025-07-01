@@ -20,7 +20,6 @@ const MenuScreen = ({
         lives={lives}
         onHomeClick={() => setGameState('menu')}
         homeIcon={Home}
-        homeText="Trang chủ"
       />
       
       

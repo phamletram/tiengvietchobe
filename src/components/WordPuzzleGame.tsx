@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Shuffle, RotateCcw, Trophy, Clock, Target, CheckCircle, XCircle, Home, Shuffle as ShuffleIcon } from 'lucide-react';
 import { lessons } from '../data/lessons.js';
+import HeaderBar from './HeaderBar.jsx';
 
 interface Word {
   vietnamese: string;
@@ -33,9 +34,11 @@ interface Card {
 
 interface WordPuzzleGameProps {
   setGameState?: (state: string) => void;
+  score: number;
+  setScore: (score: number) => void;
 }
 
-const WordPuzzleGame: React.FC<WordPuzzleGameProps> = ({ setGameState }) => {
+const WordPuzzleGame: React.FC<WordPuzzleGameProps> = ({ setGameState, score, setScore }) => {
   // Chế độ chơi: 'puzzle' (ghép chữ) hoặc 'card' (lật thẻ)
   const [mode] = useState<'puzzle'>('puzzle');
 
@@ -50,7 +53,7 @@ const WordPuzzleGame: React.FC<WordPuzzleGameProps> = ({ setGameState }) => {
   const [gameStarted, setGameStarted] = useState(false);
   const [gameCompleted, setGameCompleted] = useState(false);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
-  const [score, setScore] = useState(0);
+  const [gameScore, setGameScore] = useState(0); // Local game score
   const [attempts, setAttempts] = useState(0);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [gameTime, setGameTime] = useState(0);
@@ -100,7 +103,7 @@ const WordPuzzleGame: React.FC<WordPuzzleGameProps> = ({ setGameState }) => {
   // --- Logic cho chế độ puzzle (ghép chữ) ---
   const initializeGame = () => {
     setCurrentWordIndex(0);
-    setScore(0);
+    setGameScore(0); // Reset local game score
     setAttempts(0);
     setGameCompleted(false);
     setGameStarted(true);
@@ -153,7 +156,9 @@ const WordPuzzleGame: React.FC<WordPuzzleGameProps> = ({ setGameState }) => {
     setAttempts(prev => prev + 1);
     if (correct) {
       playSound('correct');
-      setScore(prev => prev + 100);
+      const pointsEarned = 100;
+      setGameScore(prev => prev + pointsEarned);
+      setScore(score + pointsEarned); // Update global score
       setTimeout(() => {
         if (currentWordIndex < sampleLesson.words.length - 1) {
           const nextIndex = currentWordIndex + 1;
@@ -293,7 +298,7 @@ const WordPuzzleGame: React.FC<WordPuzzleGameProps> = ({ setGameState }) => {
     setCurrentLessonIndex(randomIndex);
     // Reset game state và setup lại từ mới
     setCurrentWordIndex(0);
-    setScore(0);
+    setGameScore(0); // Reset local game score
     setAttempts(0);
     setGameCompleted(false);
     setGameStarted(true);
@@ -367,29 +372,28 @@ const WordPuzzleGame: React.FC<WordPuzzleGameProps> = ({ setGameState }) => {
   // --- UI chọn bài học ---
   if (!gameStarted && !gameCompleted) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-purple-50 via-white to-pink-50 p-4">
-        <div className="max-w-xl w-full bg-white rounded-2xl shadow-xl p-8 text-center">
-          <div className="flex justify-between mb-4">
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-400 via-purple-400 to-pink-400 font-inter">
+        <HeaderBar
+          title="Game xếp chữ"
+          score={0}
+          onHomeClick={() => setGameState ? setGameState('menu') : undefined}
+          homeIcon={Home}
+        />
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-7xl w-full p-6 sm:p-8">
+          {lessons.map((lesson, idx) => (
             <button
-              className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors duration-200"
-              onClick={() => setGameState ? setGameState('menu') : undefined}
-              title="Về trang chủ"
+              key={lesson.title}
+              className={`group bg-white rounded-3xl p-6 sm:p-8 shadow-xl cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-blue-300 active:scale-100 ${idx === currentLessonIndex ? 'ring-4 ring-purple-400' : ''}`}
+              onClick={() => setCurrentLessonIndex(idx)}
             >
-              <Home className="w-6 h-6 text-gray-600" />
+              <div className="text-7xl mb-4 text-center group-hover:animate-bounce-y">
+                {lesson.icon}
+              </div>
+              <h3 className="text-2xl sm:text-2xl font-bold text-gray-800 text-center mb-1">{lesson.title}</h3>
+              <p className="text-gray-600 text-center text-sm">{lesson.words.length} từ vựng</p>
             </button>
-          </div>
-          <h1 className="text-3xl font-bold mb-6">Chọn bài học</h1>
-          <div className="flex flex-col gap-4">
-            {lessons.map((lesson, idx) => (
-              <button
-                key={lesson.title}
-                className={`py-4 rounded-xl font-semibold text-lg transition-all duration-200 shadow-lg ${idx === currentLessonIndex ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-purple-100'}`}
-                onClick={() => setCurrentLessonIndex(idx)}
-              >
-                {lesson.icon} {lesson.title}
-              </button>
-            ))}
-          </div>
+          ))}
         </div>
       </div>
     );
@@ -398,159 +402,146 @@ const WordPuzzleGame: React.FC<WordPuzzleGameProps> = ({ setGameState }) => {
   // --- UI chế độ puzzle (ghép chữ) ---
   if (mode === 'puzzle') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 p-4">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-8">
-            <button
-              className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors duration-200"
-              onClick={() => setGameState ? setGameState('menu') : undefined}
-              title="Về trang chủ"
-            >
-              <Home className="w-6 h-6 text-gray-600" />
-            </button>
-            <h1 className="text-4xl font-bold text-gray-800">
-              🧩 Ghép chữ - {sampleLesson.title}
-            </h1>
-            <div style={{ width: 40 }} />
-          </div>
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-400 via-purple-400 to-pink-400 font-inter">
+        <HeaderBar
+          title={`🧩 Ghép chữ - ${sampleLesson.title}`}
+          score={gameScore}
+          onHomeClick={() => setGameState ? setGameState('menu') : undefined}
+          homeIcon={Home}
+        />
 
-          {/* Game Stats */}
-          {gameStarted && (
-            <div className="flex justify-center gap-4 mb-6 flex-wrap">
-              <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-md">
-                <Clock className="w-5 h-5 text-blue-600" />
-                <span className="font-semibold text-gray-700">{formatTime(gameTime)}</span>
-              </div>
-              <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-md">
-                <Target className="w-5 h-5 text-purple-600" />
-                <span className="font-semibold text-gray-700">{attempts} lần thử</span>
-              </div>
-              <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-md">
-                <Trophy className="w-5 h-5 text-green-600" />
-                <span className="font-semibold text-gray-700">{score} điểm</span>
-              </div>
-              <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-md">
-                <span className="font-semibold text-gray-700">
-                  {currentWordIndex + 1}/{sampleLesson.words.length}
-                </span>
-              </div>
-              <button
-                className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-50 transition-colors duration-200"
-                onClick={selectRandomLesson}
-                title="Chọn bài học ngẫu nhiên"
-              >
-                <ShuffleIcon className="w-5 h-5 text-orange-600" />
-                <span className="font-semibold text-gray-700">Random</span>
-              </button>
-            </div>
-          )}
-
-          {/* Game Board */}
-          {gameCompleted ? (
-            <div className="text-center">
-              <div className="bg-white rounded-2xl shadow-xl p-12 mb-8">
-                <div className="text-6xl mb-6">🎉</div>
-                <h2 className="text-3xl font-bold text-gray-800 mb-4">Chúc mừng!</h2>
-                <p className="text-gray-600 mb-6">
-                  Bạn đã hoàn thành game trong {formatTime(gameTime)} với {score} điểm!
-                </p>
-                <div className="flex justify-center gap-4">
-                  <button
-                    onClick={initializeGame}
-                    className="bg-gradient-to-r from-green-500 to-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-green-600 hover:to-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg"
-                  >
-                    <RotateCcw className="w-5 h-5 inline mr-2" />
-                    Chơi Lại
-                  </button>
+        <div className="flex-1 p-6 sm:p-8">
+          <div className="max-w-4xl mx-auto">
+            {/* Game Stats */}
+            {gameStarted && (
+              <div className="flex justify-center gap-4 mb-6 flex-wrap">
+                <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-md">
+                  <Clock className="w-5 h-5 text-blue-600" />
+                  <span className="font-semibold text-gray-700">{formatTime(gameTime)}</span>
                 </div>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-8">
-              {/* Current Word Display */}
-              <div className="bg-white rounded-2xl shadow-xl p-8">
-                <div className="text-center mb-6">
-                  <div className="text-2xl font-bold text-gray-800 mb-2">
-                    {currentWord.english}
-                  </div>
-                  {showHint && (
-                    <div className="mt-4 p-3 bg-yellow-100 rounded-lg">
-                      <span className="text-yellow-800 font-semibold">
-                        Gợi ý: {currentWord.vietnamese}
-                      </span>
-                    </div>
-                  )}
+                <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-md">
+                  <Target className="w-5 h-5 text-purple-600" />
+                  <span className="font-semibold text-gray-700">{attempts} lần thử</span>
                 </div>
+                <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-md">
+                  <Trophy className="w-5 h-5 text-green-600" />
+                  <span className="font-semibold text-gray-700">{gameScore} điểm</span>
+                </div>
+                <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-md">
+                  <span className="font-semibold text-gray-700">
+                    {currentWordIndex + 1}/{sampleLesson.words.length}
+                  </span>
+                </div>
+                <button
+                  className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-50 transition-colors duration-200"
+                  onClick={selectRandomLesson}
+                  title="Chọn bài học ngẫu nhiên"
+                >
+                  <ShuffleIcon className="w-5 h-5 text-orange-600" />
+                  <span className="font-semibold text-gray-700">Random</span>
+                </button>
+              </div>
+            )}
 
-                {/* Answer Slots */}
-                <div className="flex justify-center gap-2 mb-8 flex-wrap">
-                  {userAnswer.map((letter, index) => (
-                    <div
-                      key={index}
-                      onClick={() => handleAnswerClick(index)}
-                      className={getAnswerSlotStyle(index, letter)}
+            {/* Game Board */}
+            {gameCompleted ? (
+              <div className="text-center">
+                <div className="bg-white rounded-2xl shadow-xl p-12 mb-8">
+                  <div className="text-6xl mb-6">🎉</div>
+                  <h2 className="text-3xl font-bold text-gray-800 mb-4">Chúc mừng!</h2>
+                  <p className="text-gray-600 mb-6">
+                    Bạn đã hoàn thành game trong {formatTime(gameTime)} với {gameScore} điểm!
+                  </p>
+                  <div className="flex justify-center gap-4">
+                    <button
+                      onClick={initializeGame}
+                      className="bg-gradient-to-r from-green-500 to-blue-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-green-600 hover:to-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg"
                     >
-                      {letter}
-                    </div>
-                  ))}
+                      <RotateCcw className="w-5 h-5 inline mr-2" />
+                      Chơi Lại
+                    </button>
+                  </div>
                 </div>
-
-                {/* Feedback */}
-                {isCorrect !== null && (
+              </div>
+            ) : (
+              <div className="space-y-8">
+                {/* Current Word Display */}
+                <div className="bg-white rounded-2xl shadow-xl p-8">
                   <div className="text-center mb-6">
-                    {isCorrect ? (
-                      <div className="flex items-center justify-center gap-2 text-green-600">
-                        <CheckCircle className="w-8 h-8" />
-                        <span className="text-2xl font-bold">Chính xác! 🎉</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-center gap-2 text-red-600">
-                        <XCircle className="w-8 h-8" />
-                        <span className="text-2xl font-bold">Thử lại! 💪</span>
+                    <div className="text-2xl font-bold text-gray-800 mb-2">
+                      {currentWord.english}
+                    </div>
+                    {showHint && (
+                      <div className="mt-4 p-3 bg-yellow-100 rounded-lg">
+                        <span className="text-yellow-800 font-semibold">
+                          Gợi ý: {currentWord.vietnamese}
+                        </span>
                       </div>
                     )}
                   </div>
-                )}
 
-                {/* Letter Tiles */}
-                <div className="flex justify-center gap-2 mb-6 flex-wrap">
-                  {letterTiles.map((tile) => (
-                    <div
-                      key={tile.id}
-                      onClick={() => handleLetterClick(tile.id)}
-                      className={getLetterTileStyle(tile)}
-                    >
-                      {tile.letter}
+                  {/* Answer Slots */}
+                  <div className="flex justify-center gap-2 mb-8 flex-wrap">
+                    {userAnswer.map((letter, index) => (
+                      <div
+                        key={index}
+                        onClick={() => handleAnswerClick(index)}
+                        className={getAnswerSlotStyle(index, letter)}
+                      >
+                        {letter}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Feedback */}
+                  {isCorrect !== null && (
+                    <div className="text-center mb-6">
+                      {isCorrect ? (
+                        <div className="flex items-center justify-center gap-2 text-green-600">
+                          <CheckCircle className="w-8 h-8" />
+                          <span className="text-2xl font-bold">Chính xác! 🎉</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center justify-center gap-2 text-red-600">
+                          <XCircle className="w-8 h-8" />
+                          <span className="text-2xl font-bold">Thử lại! 💪</span>
+                        </div>
+                      )}
                     </div>
-                  ))}
-                </div>
+                  )}
 
-                {/* Action Buttons */}
-                <div className="flex justify-center gap-4">
-                  <button
-                    onClick={() => setShowHint(!showHint)}
-                    className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-4 py-2 rounded-lg font-semibold hover:from-yellow-500 hover:to-orange-600 transition-all duration-200"
-                  >
-                    {showHint ? 'Ẩn' : 'Hiện'} Gợi Ý
-                  </button>
-                  <button
-                    onClick={skipWord}
-                    className="bg-gradient-to-r from-gray-400 to-gray-500 text-white px-4 py-2 rounded-lg font-semibold hover:from-gray-500 hover:to-gray-600 transition-all duration-200"
-                  >
-                    Bỏ Qua
-                  </button>
-                  <button
-                    onClick={() => setupCurrentWord(currentWordIndex)}
-                    className="bg-gradient-to-r from-blue-400 to-blue-500 text-white px-4 py-2 rounded-lg font-semibold hover:from-blue-500 hover:to-blue-600 transition-all duration-200"
-                  >
-                    <Shuffle className="w-4 h-4 inline mr-1" />
-                    Trộn Lại
-                  </button>
+                  {/* Letter Tiles */}
+                  <div className="flex justify-center gap-2 flex-wrap">
+                    {letterTiles.map((tile) => (
+                      <div
+                        key={tile.id}
+                        onClick={() => handleLetterClick(tile.id)}
+                        className={getLetterTileStyle(tile)}
+                      >
+                        {tile.letter}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex justify-center gap-4 mt-8">
+                    <button
+                      onClick={() => setShowHint(!showHint)}
+                      className="bg-yellow-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-yellow-600 transition-colors duration-200 shadow-lg"
+                    >
+                      💡 Gợi ý
+                    </button>
+                    <button
+                      onClick={skipWord}
+                      className="bg-gray-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-gray-600 transition-colors duration-200 shadow-lg"
+                    >
+                      ⏭️ Bỏ qua
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     );

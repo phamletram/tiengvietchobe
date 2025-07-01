@@ -1,7 +1,8 @@
 // components/DragDropMatchGame.js
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Home, RefreshCcw, Clock, Lightbulb, Trophy, Star, Volume2, VolumeX } from 'lucide-react';
+import { Home, RefreshCcw, Clock, Lightbulb, Trophy, Star, Volume2, VolumeX, RotateCcw, Target, CheckCircle, XCircle } from 'lucide-react';
 import { lessons } from '../data/lessons.js';
+import HeaderBar from './HeaderBar.jsx';
 
 function MemoryCard({ card, isFlipped, isMatched, onClick, disabled }) {
   const getCardContent = () => {
@@ -38,14 +39,14 @@ function MemoryCard({ card, isFlipped, isMatched, onClick, disabled }) {
   );
 }
 
-const GameScreen = ({ setGameState }) => {
+const GameScreen = ({ setGameState, score, setScore }) => {
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
   const [cards, setCards] = useState([]);
   const [flippedCards, setFlippedCards] = useState([]);
   const [matchedPairs, setMatchedPairs] = useState([]);
   const [disabled, setDisabled] = useState(false);
   const [moves, setMoves] = useState(0);
-  const [score, setScore] = useState(0);
+  const [gameScore, setGameScore] = useState(0); // Local game score
   const [timeLeft, setTimeLeft] = useState(120);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [showHint, setShowHint] = useState(false);
@@ -128,7 +129,7 @@ const GameScreen = ({ setGameState }) => {
     setMatchedPairs([]);
     setDisabled(false);
     setMoves(0);
-    setScore(0);
+    setGameScore(0); // Reset local game score
     setTimeLeft(120);
     setIsTimerRunning(true);
     setShowHint(false);
@@ -159,9 +160,11 @@ const GameScreen = ({ setGameState }) => {
       if (firstCard.pairId === secondCard.pairId) {
         // Match found
         setMatchedPairs(prev => [...prev, firstCard.pairId]);
-        setScore(prev => prev + 1);
+        const pointsEarned = 10;
+        setGameScore(prev => prev + pointsEarned);
+        setScore(score + pointsEarned); // Update global score
         setStreak(prev => prev + 1);
-        setBestScore(prev => Math.max(prev, score + 1));
+        setBestScore(prev => Math.max(prev, gameScore + pointsEarned));
         playSound('correct');
         setFlippedCards([]);
         setDisabled(false);
@@ -210,7 +213,7 @@ const GameScreen = ({ setGameState }) => {
 
   const getScoreColor = () => {
     const totalPairs = cards.length / 2;
-    const percentage = (score / totalPairs) * 100;
+    const percentage = (gameScore / totalPairs) * 100;
     if (percentage >= 80) return 'text-green-600';
     if (percentage >= 60) return 'text-yellow-600';
     return 'text-red-600';
@@ -218,7 +221,7 @@ const GameScreen = ({ setGameState }) => {
 
   const getScoreEmoji = () => {
     const totalPairs = cards.length / 2;
-    const percentage = (score / totalPairs) * 100;
+    const percentage = (gameScore / totalPairs) * 100;
     if (percentage === 100) return '🏆';
     if (percentage >= 80) return '🎉';
     if (percentage >= 60) return '👍';
@@ -226,115 +229,71 @@ const GameScreen = ({ setGameState }) => {
   };
 
   return (
-    <div className="h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-4">
-      <div className="w-full max-w-6xl h-full max-h-[90vh] bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-6 flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-4">
-          <button 
-            onClick={() => setGameState('menu')} 
-            className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors duration-200"
-          >
-            <Home className="w-5 h-5 text-gray-600" />
-          </button>
-          
-          <div className="text-center">
-            <h2 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              🃏 Game Lật Chữ 🃏
-            </h2>
-            <p className="text-xs text-gray-500">{lessons[currentLessonIndex]?.title}</p>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <button 
-              onClick={() => setSoundEnabled(!soundEnabled)}
-              className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors duration-200"
-            >
-              {soundEnabled ? <Volume2 className="w-5 h-5 text-gray-600" /> : <VolumeX className="w-5 h-5 text-gray-600" />}
-            </button>
-            <button 
-              onClick={changeLesson}
-              className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors duration-200"
-            >
-              <RefreshCcw className="w-5 h-5 text-gray-600" />
-            </button>
-          </div>
-        </div>
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-400 via-purple-400 to-pink-400 font-inter">
+      <HeaderBar
+        title="Trò chơi ghép từ"
+        score={gameScore}
+        onHomeClick={() => setGameState ? setGameState('menu') : undefined}
+        homeIcon={Home}
+      />
 
-        {/* Stats Bar */}
-        <div className="grid grid-cols-4 gap-2 mb-4">
-          <div className="bg-blue-50 p-2 rounded-lg text-center">
-            <div className="flex items-center justify-center space-x-1">
-              <Clock className="w-3 h-3 text-blue-600" />
-              <span className="text-xs font-semibold text-blue-600">
-                {formatTime(timeLeft)}
-              </span>
+      <div className="flex-1 p-6 sm:p-8">
+        <div className="max-w-6xl mx-auto">
+          {/* Game Stats */}
+          <div className="flex justify-center gap-4 mb-6 flex-wrap">
+            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-md">
+              <Clock className="w-5 h-5 text-blue-600" />
+              <span className="font-semibold text-gray-700">{formatTime(timeLeft)}</span>
+            </div>
+            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-md">
+              <Trophy className="w-5 h-5 text-green-600" />
+              <span className="font-semibold text-gray-700">{gameScore} điểm</span>
+            </div>
+            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-md">
+              <Star className="w-5 h-5 text-yellow-600" />
+              <span className="font-semibold text-gray-700">{moves} lần thử</span>
+            </div>
+            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-md">
+              <Lightbulb className="w-5 h-5 text-purple-600" />
+              <span className="font-semibold text-gray-700">{streak} chuỗi thắng</span>
             </div>
           </div>
-          
-          <div className="bg-green-50 p-2 rounded-lg text-center">
-            <div className="flex items-center justify-center space-x-1">
-              <Trophy className="w-3 h-3 text-green-600" />
-              <span className="text-xs font-semibold text-green-600">
-                {score}
-              </span>
-            </div>
-          </div>
-          
-          <div className="bg-yellow-50 p-2 rounded-lg text-center">
-            <div className="flex items-center justify-center space-x-1">
-              <Star className="w-3 h-3 text-yellow-600" />
-              <span className="text-xs font-semibold text-yellow-600">
-                {moves}
-              </span>
-            </div>
-          </div>
-          
-          <div className="bg-purple-50 p-2 rounded-lg text-center">
-            <div className="flex items-center justify-center space-x-1">
-              <Lightbulb className="w-3 h-3 text-purple-600" />
-              <span className="text-xs font-semibold text-purple-600">
-                {streak}
-              </span>
-            </div>
-          </div>
-        </div>
 
-
-        {/* Memory Cards Grid */}
-        <div className="flex-1 flex items-center justify-center">
-          <div className="grid grid-cols-4 gap-3 max-w-md">
-            {cards.map((card) => {
-              const isFlipped = flippedCards.find(c => c.id === card.id);
-              const isMatched = matchedPairs.includes(card.pairId);
-              
-              return (
-                <MemoryCard
-                  key={card.id}
-                  card={card}
-                  isFlipped={!!isFlipped}
-                  isMatched={isMatched}
-                  onClick={handleCardClick}
-                  disabled={disabled}
-                />
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Bottom Action Area */}
-        <div className="mt-4 text-center">
-          {isGameComplete ? (
-            <div className="space-y-3">
-              <div className={`text-2xl font-bold ${getScoreColor()}`}>
-                {getScoreEmoji()} Hoàn thành! Điểm: {score}/{cards.length / 2}
+          {/* Game Board */}
+          <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Lật thẻ tìm cặp từ giống nhau</h2>
+            <div className="flex justify-center">
+              <div className="grid grid-cols-4 gap-3 max-w-md">
+                {cards.map((card) => {
+                  const isFlipped = flippedCards.find(c => c.id === card.id);
+                  const isMatched = matchedPairs.includes(card.pairId);
+                  
+                  return (
+                    <MemoryCard
+                      key={card.id}
+                      card={card}
+                      isFlipped={!!isFlipped}
+                      isMatched={isMatched}
+                      onClick={handleCardClick}
+                      disabled={disabled}
+                    />
+                  );
+                })}
               </div>
-              
+            </div>
+          </div>
+
+          {/* Feedback */}
+          {isGameComplete && (
+            <div className="text-center mt-8">
+              <div className={`text-2xl font-bold ${getScoreColor()}`}>
+                {getScoreEmoji()} Hoàn thành! Điểm: {gameScore}/{cards.length / 2}
+              </div>
               <div className="text-sm text-gray-600">
                 <div>Số lượt: {moves} | Thời gian: {formatTime(120 - timeLeft)}</div>
                 <div>Chuỗi thắng: {streak}</div>
               </div>
-              
-              <div className="flex space-x-3 justify-center">
+              <div className="flex space-x-3 justify-center mt-4">
                 <button
                   onClick={initializeGame}
                   className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold transition-colors duration-200 text-sm"
@@ -355,34 +314,18 @@ const GameScreen = ({ setGameState }) => {
                 </button>
               </div>
             </div>
-          ) : timeLeft === 0 ? (
-            <div className="space-y-3">
-              <div className="text-xl font-bold text-red-600">
-                ⏰ Hết thời gian!
-              </div>
-              <div className="text-sm text-gray-600">
-                Điểm: {score}/{cards.length / 2} | Số lượt: {moves}
-              </div>
-              <div className="flex space-x-3 justify-center">
-                <button
-                  onClick={initializeGame}
-                  className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold transition-colors duration-200 text-sm"
-                >
-                  Chơi lại
-                </button>
-                <button
-                  onClick={() => setGameState('menu')}
-                  className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 text-sm"
-                >
-                  Về menu
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="text-sm text-gray-500">
-              Tìm {cards.length / 2} cặp để hoàn thành!
-            </div>
           )}
+
+          {/* Action Buttons */}
+          <div className="flex justify-center gap-4 mt-8">
+            <button
+              onClick={initializeGame}
+              className="bg-blue-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-600 transition-colors duration-200 shadow-lg"
+            >
+              <RotateCcw className="w-5 h-5 inline mr-2" />
+              Chơi Lại
+            </button>
+          </div>
         </div>
       </div>
     </div>
