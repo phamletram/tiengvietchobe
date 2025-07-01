@@ -54,6 +54,23 @@ const MenuScreen = ({
               
               
             </button>
+
+            <button
+              onClick={() => {
+              
+                setGameState('puzzlegame');
+              }}
+              className="group bg-white rounded-3xl p-6 sm:p-8 shadow-xl cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-blue-300 active:scale-100"
+            >
+              <div className="text-7xl mb-4 text-center group-hover:animate-bounce-y">
+                
+                <span role="img" aria-label="game">🧩</span>
+
+              </div>
+              <h3 className="text-2xl sm:text-2xl font-bold text-gray-800 text-center mb-1">Game xếp chữ</h3>
+              
+              
+            </button>
           
         </div>
      
