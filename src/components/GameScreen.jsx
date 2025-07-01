@@ -241,23 +241,9 @@ const GameScreen = ({ setGameState, score, setScore }) => {
 
   // Hiệu ứng âm thanh khi hoàn thành
   const playFinishSound = () => {
-    if (!audioCtxRef.current) return;
-    const audioContext = audioCtxRef.current;
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-    oscillator.type = 'triangle';
-    oscillator.frequency.setValueAtTime(1200, audioContext.currentTime);
-    gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.7);
-    oscillator.start(audioContext.currentTime);
-    oscillator.frequency.linearRampToValueAtTime(2000, audioContext.currentTime + 0.7);
-    oscillator.stop(audioContext.currentTime + 0.7);
-    oscillator.onended = () => {
-      oscillator.disconnect();
-      gainNode.disconnect();
-    };
+    const audio = new window.Audio('/sounds/applause.mp3');
+    audio.volume = 0.7; // Có thể chỉnh nhỏ/lớn hơn nếu muốn
+    audio.play();
   };
 
   // Hiển thị popup khi hoàn thành game thực sự
@@ -265,7 +251,7 @@ const GameScreen = ({ setGameState, score, setScore }) => {
     if (isGameComplete && prevIsGameComplete.current === false && hasPlayed) {
       setShowScorePopup(true);
       playFinishSound();
-      setTimeout(() => setShowScorePopup(false), 6000);
+      setTimeout(() => setShowScorePopup(false), 8000);
     }
     prevIsGameComplete.current = isGameComplete;
   }, [isGameComplete, hasPlayed]);
