@@ -21,22 +21,42 @@ const MenuScreen = ({
         <p className="text-xl md:text-2xl text-white drop-shadow-md opacity-90">Cùng nhau vui học!!!</p>
       </div>
       
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-7xl w-full">
-        {lessons.map((lesson, index) => (
-          <button
-            key={index}
-            onClick={() => {
-              setCurrentLesson(index);
-              setGameState('lesson');
-            }}
-            className="group bg-white rounded-3xl p-6 sm:p-8 shadow-xl cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-blue-300 active:scale-100"
-          >
-            <div className="text-7xl mb-4 text-center group-hover:animate-bounce-y">{lesson.icon}</div>
-            <h3 className="text-2xl sm:text-2xl font-bold text-gray-800 text-center mb-1">{lesson.title}</h3>
-            <p className="text-gray-600 text-center text-sm">{lesson.words.length} từ vựng</p>
-          </button>
-        ))}
-      </div>
+      
+        <div className="grid grid-cols-1 sm:grid-cols-2  xl:grid-cols-4 gap-6 max-w-7xl w-full">
+          
+            <button
+              
+              onClick={() => {
+              
+                setGameState('topic');
+              }}
+              className="group bg-white rounded-3xl p-6 sm:p-8 shadow-xl cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-blue-300 active:scale-100"
+            >
+            <div className="text-7xl mb-4 text-center group-hover:animate-bounce-y">
+                <span role="img" aria-label="vocabulary">📚</span>
+            </div>
+              <h3 className="text-2xl sm:text-2xl font-bold text-gray-800 text-center mb-1">Từ vựng theo chủ đề</h3>
+              
+            </button>
+            <button
+              onClick={() => {
+              
+                setGameState('game');
+              }}
+              className="group bg-white rounded-3xl p-6 sm:p-8 shadow-xl cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-blue-300 active:scale-100"
+            >
+              <div className="text-7xl mb-4 text-center group-hover:animate-bounce-y">
+                
+                <span role="img" aria-label="game">📟</span>
+
+              </div>
+              <h3 className="text-2xl sm:text-2xl font-bold text-gray-800 text-center mb-1">Trò chơi</h3>
+              
+              
+            </button>
+          
+        </div>
+     
       
       <div className="mt-12 text-center">
         <div className="flex items-center justify-center space-x-6 text-white">

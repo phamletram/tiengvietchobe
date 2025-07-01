@@ -5,6 +5,8 @@ import LessonScreen from './components/LessonScreen.jsx';
 import QuizScreen from './components/QuizScreen.jsx';
 import CompleteScreen from './components/CompleteScreen.jsx';
 import GameOverScreen from './components/GameOverScreen.jsx';
+import TopicWordScreen from './components/TopicWordsScreen.jsx';
+import GameScreen from './components/GameScreen.jsx';
 import { lessons } from './data/lessons.js';
 
 const VietnameseLearningApp = () => {
@@ -111,12 +113,16 @@ const VietnameseLearningApp = () => {
   switch (gameState) {
     case 'menu':
       return <MenuScreen {...screenProps} />;
+    case 'topic':
+      return <TopicWordScreen {...screenProps} />;
     case 'lesson':
       return <LessonScreen {...screenProps} />;
     case 'quiz':
       return <QuizScreen {...screenProps} />;
     case 'complete':
       return <CompleteScreen {...screenProps} />;
+    case 'game':
+      return <GameScreen {...screenProps} />;
     default:
       return <MenuScreen {...screenProps} />;
   }
