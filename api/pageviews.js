@@ -21,27 +21,41 @@ export default async function handler(req, res) {
 
   
   try {
-    const [response] = await analyticsDataClient.runReport({
+    // Lấy tổng views
+    const [responseTotal] = await analyticsDataClient.runReport({
       property: propertyId,
       dateRanges: [
         {
-          startDate: '2025-05-01', // Hoặc '2020-01-01' để lấy toàn bộ lịch sử
+          startDate: '2025-05-01',
           endDate: 'today',
         },
       ],
       metrics: [
-        {
-          name: 'screenPageViews',
-        },
+        { name: 'screenPageViews' },
       ],
     });
-
     let totalPageViews = 0;
-    if (response.rows && response.rows.length > 0) {
-      totalPageViews = parseInt(response.rows[0].metricValues[0].value);
+    if (responseTotal.rows && responseTotal.rows.length > 0) {
+      totalPageViews = parseInt(responseTotal.rows[0].metricValues[0].value);
     }
-
-    res.status(200).json({ pageViews: totalPageViews });
+    // Lấy views hôm nay
+    const [responseToday] = await analyticsDataClient.runReport({
+      property: propertyId,
+      dateRanges: [
+        {
+          startDate: 'today',
+          endDate: 'today',
+        },
+      ],
+      metrics: [
+        { name: 'screenPageViews' },
+      ],
+    });
+    let todayViews = 0;
+    if (responseToday.rows && responseToday.rows.length > 0) {
+      todayViews = parseInt(responseToday.rows[0].metricValues[0].value);
+    }
+    res.status(200).json({ pageViews: totalPageViews, todayViews });
 
   } catch (error) {
     console.error('Lỗi khi lấy dữ liệu Google Analytics:', error);
