@@ -50,7 +50,7 @@ const MenuScreen = ({
                 <span role="img" aria-label="game">📟</span>
 
               </div>
-              <h3 className="text-2xl sm:text-2xl font-bold text-gray-800 text-center mb-1">Trò chơi</h3>
+              <h3 className="text-2xl sm:text-2xl font-bold text-gray-800 text-center mb-1">Trò chơi lật thẻ</h3>
               
               
             </button>

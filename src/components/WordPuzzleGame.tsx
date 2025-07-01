@@ -404,7 +404,7 @@ const WordPuzzleGame: React.FC<WordPuzzleGameProps> = ({ setGameState, score, se
     return (
       <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-400 via-purple-400 to-pink-400 font-inter">
         <HeaderBar
-          title={`🧩 Ghép chữ - ${sampleLesson.title}`}
+          title={`🧩 Xếp chữ - ${sampleLesson.title}`}
           score={gameScore}
           onHomeClick={() => setGameState ? setGameState('menu') : undefined}
           homeIcon={Home}

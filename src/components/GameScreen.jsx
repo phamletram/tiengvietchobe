@@ -1,8 +1,9 @@
 // components/DragDropMatchGame.js
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Home, RefreshCcw, Clock, Lightbulb, Trophy, Star, Volume2, VolumeX, RotateCcw, Target, CheckCircle, XCircle } from 'lucide-react';
+import { Home, RefreshCcw, Clock, Lightbulb, Trophy, Star, Volume2, VolumeX, RotateCcw, Target, CheckCircle, XCircle, Shuffle } from 'lucide-react';
 import { lessons } from '../data/lessons.js';
 import HeaderBar from './HeaderBar.jsx';
+import Confetti from 'react-confetti';
 
 function MemoryCard({ card, isFlipped, isMatched, onClick, disabled }) {
   const getCardContent = () => {
@@ -53,6 +54,9 @@ const GameScreen = ({ setGameState, score, setScore }) => {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [streak, setStreak] = useState(0);
   const [bestScore, setBestScore] = useState(0);
+  const [showScorePopup, setShowScorePopup] = useState(false);
+  const prevIsGameComplete = useRef(false);
+  const [hasPlayed, setHasPlayed] = useState(false);
 
   const audioCtxRef = useRef(null);
 
@@ -141,8 +145,15 @@ const GameScreen = ({ setGameState, score, setScore }) => {
     setCurrentLessonIndex(nextIndex);
   };
 
+  // Change lesson randomly
+  const changeLessonRandom = () => {
+    const randomIndex = Math.floor(Math.random() * lessons.length);
+    setCurrentLessonIndex(randomIndex);
+  };
+
   // Handle card click
   const handleCardClick = (clickedCard) => {
+    if (!hasPlayed) setHasPlayed(true);
     if (disabled || flippedCards.length >= 2 || flippedCards.find(card => card.id === clickedCard.id)) {
       return;
     }
@@ -228,10 +239,46 @@ const GameScreen = ({ setGameState, score, setScore }) => {
     return '😔';
   };
 
+  // Hiệu ứng âm thanh khi hoàn thành
+  const playFinishSound = () => {
+    if (!audioCtxRef.current) return;
+    const audioContext = audioCtxRef.current;
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    oscillator.type = 'triangle';
+    oscillator.frequency.setValueAtTime(1200, audioContext.currentTime);
+    gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.7);
+    oscillator.start(audioContext.currentTime);
+    oscillator.frequency.linearRampToValueAtTime(2000, audioContext.currentTime + 0.7);
+    oscillator.stop(audioContext.currentTime + 0.7);
+    oscillator.onended = () => {
+      oscillator.disconnect();
+      gainNode.disconnect();
+    };
+  };
+
+  // Hiển thị popup khi hoàn thành game thực sự
+  useEffect(() => {
+    if (isGameComplete && prevIsGameComplete.current === false && hasPlayed) {
+      setShowScorePopup(true);
+      playFinishSound();
+      setTimeout(() => setShowScorePopup(false), 6000);
+    }
+    prevIsGameComplete.current = isGameComplete;
+  }, [isGameComplete, hasPlayed]);
+
+  // Reset flag khi đổi bài hoặc chơi lại
+  useEffect(() => {
+    setHasPlayed(false);
+  }, [currentLessonIndex]);
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-400 via-purple-400 to-pink-400 font-inter">
       <HeaderBar
-        title="Trò chơi ghép từ"
+        title="Tìm cặp từ giống nhau"
         score={gameScore}
         onHomeClick={() => setGameState ? setGameState('menu') : undefined}
         homeIcon={Home}
@@ -241,93 +288,79 @@ const GameScreen = ({ setGameState, score, setScore }) => {
         <div className="max-w-6xl mx-auto">
           {/* Game Stats */}
           <div className="flex justify-center gap-4 mb-6 flex-wrap">
-            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-md">
-              <Clock className="w-5 h-5 text-blue-600" />
-              <span className="font-semibold text-gray-700">{formatTime(timeLeft)}</span>
+            <div className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-100 to-blue-200 px-6 py-3 rounded-2xl shadow-md min-w-[120px]">
+              <Clock className="w-6 h-6 text-blue-600" />
+              <span className="font-semibold text-gray-700 text-lg">{formatTime(timeLeft)}</span>
             </div>
-            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-md">
-              <Trophy className="w-5 h-5 text-green-600" />
-              <span className="font-semibold text-gray-700">{gameScore} điểm</span>
+            <div className="flex items-center justify-center gap-2 bg-gradient-to-r from-green-100 to-green-200 px-6 py-3 rounded-2xl shadow-md min-w-[120px]">
+              <Trophy className="w-6 h-6 text-green-600" />
+              <span className="font-semibold text-gray-700 text-lg">{gameScore} điểm</span>
             </div>
-            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-md">
-              <Star className="w-5 h-5 text-yellow-600" />
-              <span className="font-semibold text-gray-700">{moves} lần thử</span>
-            </div>
-            <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg shadow-md">
-              <Lightbulb className="w-5 h-5 text-purple-600" />
-              <span className="font-semibold text-gray-700">{streak} chuỗi thắng</span>
-            </div>
-          </div>
-
-          {/* Game Board */}
-          <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Lật thẻ tìm cặp từ giống nhau</h2>
-            <div className="flex justify-center">
-              <div className="grid grid-cols-4 gap-3 max-w-md">
-                {cards.map((card) => {
-                  const isFlipped = flippedCards.find(c => c.id === card.id);
-                  const isMatched = matchedPairs.includes(card.pairId);
-                  
-                  return (
-                    <MemoryCard
-                      key={card.id}
-                      card={card}
-                      isFlipped={!!isFlipped}
-                      isMatched={isMatched}
-                      onClick={handleCardClick}
-                      disabled={disabled}
-                    />
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          {/* Feedback */}
-          {isGameComplete && (
-            <div className="text-center mt-8">
-              <div className={`text-2xl font-bold ${getScoreColor()}`}>
-                {getScoreEmoji()} Hoàn thành! Điểm: {gameScore}/{cards.length / 2}
-              </div>
-              <div className="text-sm text-gray-600">
-                <div>Số lượt: {moves} | Thời gian: {formatTime(120 - timeLeft)}</div>
-                <div>Chuỗi thắng: {streak}</div>
-              </div>
-              <div className="flex space-x-3 justify-center mt-4">
-                <button
-                  onClick={initializeGame}
-                  className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold transition-colors duration-200 text-sm"
-                >
-                  Chơi lại
-                </button>
-                <button
-                  onClick={changeLesson}
-                  className="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg font-semibold transition-colors duration-200 text-sm"
-                >
-                  Bài khác
-                </button>
-                <button
-                  onClick={() => setGameState('menu')}
-                  className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-semibold transition-colors duration-200 text-sm"
-                >
-                  Về menu
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Action Buttons */}
-          <div className="flex justify-center gap-4 mt-8">
             <button
-              onClick={initializeGame}
-              className="bg-blue-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-600 transition-colors duration-200 shadow-lg"
+              className="flex items-center justify-center gap-2 bg-gradient-to-r from-orange-100 to-pink-200 px-6 py-3 rounded-2xl shadow-md min-w-[120px] hover:from-orange-200 hover:to-pink-300 transition-colors duration-200"
+              onClick={changeLessonRandom}
+              title="Chọn bài học ngẫu nhiên"
             >
-              <RotateCcw className="w-5 h-5 inline mr-2" />
-              Chơi Lại
+              <Shuffle className="w-6 h-6 text-orange-600" />
+              <span className="font-semibold text-gray-700 text-lg">Bài khác</span>
             </button>
+          </div>
+
+          
+        </div>
+
+        {/* Game Board */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8 relative">
+          {/* Nút Chơi lại - góc trái trên */}
+          <button
+            onClick={initializeGame}
+            className="absolute top-4 left-4 bg-gradient-to-r from-green-500 to-blue-600 text-white px-4 py-2 rounded-xl font-semibold text-sm hover:from-green-600 hover:to-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg flex items-center gap-2"
+          >
+            <RotateCcw className="w-4 h-4" />
+            Chơi lại
+          </button>
+          
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+            {lessons[currentLessonIndex]?.icon} {lessons[currentLessonIndex]?.title}
+          </h2>
+          <div className="flex justify-center">
+            <div className="grid grid-cols-4 gap-3 max-w-md">
+              {cards.map((card) => {
+                const isFlipped = flippedCards.find(c => c.id === card.id);
+                const isMatched = matchedPairs.includes(card.pairId);
+                
+                return (
+                  <MemoryCard
+                    key={card.id}
+                    card={card}
+                    isFlipped={!!isFlipped}
+                    isMatched={isMatched}
+                    onClick={handleCardClick}
+                    disabled={disabled}
+                  />
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Toast điểm số khi hoàn thành + Confetti */}
+      {showScorePopup && (
+        <>
+          <Confetti numberOfPieces={180} recycle={false} className="pointer-events-none z-50" run={true} width={window.innerWidth} height={window.innerHeight} />
+          <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
+            <div className="bg-transparent flex flex-col items-center animate-fade-in-up">
+              <div className="text-5xl font-extrabold mb-2 bg-gradient-to-r from-pink-500 via-yellow-400 to-blue-500 bg-clip-text text-transparent drop-shadow-lg">
+                Hoàn thành!
+              </div>
+              <div className="text-3xl font-bold bg-gradient-to-r from-pink-500 via-yellow-400 to-blue-500 bg-clip-text text-transparent drop-shadow-lg">
+                Điểm: {gameScore}/{cards.length / 2}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
