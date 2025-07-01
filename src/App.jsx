@@ -8,6 +8,7 @@ import GameOverScreen from './components/GameOverScreen.jsx';
 import TopicWordScreen from './components/TopicWordsScreen.jsx';
 import GameScreen from './components/GameScreen.jsx';
 import WordPuzzleGame from './components/WordPuzzleGame.tsx';
+import AlphabetGame from './components/AlphabetGame.jsx';
 //import WordGame from './components/WordGame.jsx';
 import { lessons } from './data/lessons.js';
 
@@ -127,6 +128,8 @@ const VietnameseLearningApp = () => {
       return <GameScreen {...screenProps} />;
     case 'puzzlegame':
         return <WordPuzzleGame {...screenProps} />;
+    case 'alphabet':
+        return <AlphabetGame {...screenProps} />;
     default:
       return <MenuScreen {...screenProps} />;
   }
