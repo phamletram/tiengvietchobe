@@ -260,9 +260,9 @@ const FlipGameScreen = ({ setGameState, score, setScore }) => {
 
       {/* Main content */}
       <main className={`transition-all duration-300 flex flex-col items-center justify-start w-full overflow-y-auto ${showMenu ? 'pl-44' : ''}`} style={{willChange: 'transform', height: 'calc(100vh - 56px - 32px)', marginTop: '56px'}}>
-        <div className="flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 w-full max-w-7xl">
+        <div className="flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 w-full max-w-7xl pb-8">
           {/* Game Stats */}
-          <div className="flex justify-center gap-3 sm:gap-4 mb-4 sm:mb-6 flex-wrap">
+          <div className="flex flex-nowrap justify-center gap-2 sm:gap-4 mb-4 sm:mb-6">
             <div className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-100 to-blue-200 px-4 sm:px-6 py-2 sm:py-3 rounded-2xl shadow-md min-w-[100px] sm:min-w-[120px]">
               <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
               <span className="font-semibold text-gray-700 text-base sm:text-lg">{formatTime(timeLeft)}</span>
@@ -282,21 +282,21 @@ const FlipGameScreen = ({ setGameState, score, setScore }) => {
 
           {/* Game Board */}
           <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 relative w-full max-w-4xl">
-            {/* Nút Chơi lại - góc trái trên */}
-            <button
-              onClick={initializeGame}
-              className="absolute top-2 sm:top-4 left-2 sm:left-4 bg-gradient-to-r from-green-500 to-blue-600 text-white px-3 sm:px-4 py-1 sm:py-2 rounded-xl font-semibold text-xs sm:text-sm hover:from-green-600 hover:to-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg flex items-center gap-1 sm:gap-2"
-            >
-              <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">Chơi lại</span>
-              <span className="sm:hidden">Lại</span>
-            </button>
-            
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 text-center mt-8 sm:mt-0">
-              {lessons[currentLessonIndex]?.icon} {lessons[currentLessonIndex]?.title}
-            </h2>
+            <div className="flex items-center gap-2 sm:gap-4 mb-4">
+              <button
+                onClick={initializeGame}
+                className="bg-gradient-to-r from-green-500 to-blue-600 text-white px-3 sm:px-4 py-1 sm:py-2 rounded-xl font-semibold text-xs sm:text-sm hover:from-green-600 hover:to-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg flex items-center gap-1 sm:gap-2"
+                style={{ minWidth: 70 }}
+              >
+                <RotateCcw className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="text-xs sm:text-sm">Chơi lại</span>
+              </button>
+              <h2 className="flex-1 text-base sm:text-xl md:text-2xl font-bold text-gray-800 text-center">
+                {lessons[currentLessonIndex]?.icon} {lessons[currentLessonIndex]?.title}
+              </h2>
+            </div>
             <div className="flex justify-center items-center">
-              <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-1.5 w-full max-w-sm lg:max-w-md place-items-center">
+              <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-1.5 sm:gap-2 md:gap-4 lg:gap-6 w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-3xl xl:max-w-5xl place-items-center">
                 {cards.map((card) => {
                   const isFlipped = flippedCards.find(c => c.id === card.id);
                   const isMatched = matchedPairs.includes(card.pairId);

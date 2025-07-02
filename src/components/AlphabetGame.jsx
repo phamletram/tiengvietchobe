@@ -1,10 +1,11 @@
 import React, { useState, useRef } from 'react';
-import { CheckCircle, XCircle, RotateCcw, ArrowLeft, ArrowRight, Volume2 } from 'lucide-react';
+import { CheckCircle, XCircle, ArrowLeft, ArrowRight, Volume2 } from 'lucide-react';
 import Header from './Header.jsx';
 import Menu from './Menu.jsx';
 import Footer from './Footer.jsx';
 import { handleMenuClick } from '../utils/menuUtils.js';
 import { useResponsiveMenu } from '../hooks/useResponsiveMenu.js';
+import PropTypes from 'prop-types';
 
 const vietnameseAlphabet = [
   { letter: 'A', smallLetter: 'a', pronunciation: 'a', example: 'áo', exampleMeaning: 'shirt' },
@@ -163,7 +164,7 @@ const AlphabetGame = ({ setGameState, score, setScore }) => {
           showMenu={showMenu}
           onMenuClick={onMenuClick}
         />
-        <main className={`transition-all duration-300 flex flex-col items-center justify-start w-full overflow-y-auto ${showMenu ? 'pl-44' : ''}`} style={{willChange: 'transform', height: 'calc(100vh - 56px - 32px)', marginTop: '56px'}}>
+        <main className={`transition-all duration-300 flex flex-col items-center justify-start w-full sm:overflow-y-auto overflow-hidden ${showMenu ? 'pl-44' : ''}`} style={{willChange: 'transform', height: 'calc(100vh - 56px - 32px)', marginTop: '56px'}}>
           <div className="max-w-4xl mx-auto w-full p-6 sm:p-8">
             {/* Letter Display */}
             <div className="bg-white rounded-2xl shadow-xl p-12 mb-8 relative">
@@ -203,28 +204,28 @@ const AlphabetGame = ({ setGameState, score, setScore }) => {
             </div>
 
             {/* Navigation */}
-            <div className="flex justify-center gap-4 mb-8">
+            <div className="flex justify-center gap-2 sm:gap-4 mb-8">
               <button
                 onClick={prevLetter}
                 disabled={currentIndex === 0}
-                className="flex items-center gap-2 bg-blue-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+                className="flex items-center gap-1 sm:gap-2 bg-blue-500 text-white px-3 py-1.5 sm:px-6 sm:py-3 rounded-xl font-semibold hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200 text-xs sm:text-base"
               >
-                <ArrowLeft className="w-5 h-5" />
+                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
                 Trước
               </button>
               <button
                 onClick={startQuiz}
-                className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-3 rounded-xl font-semibold text-xl hover:from-purple-600 hover:to-pink-600 transform hover:scale-105 transition-all duration-200 shadow-lg"
+                className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-1.5 sm:px-8 sm:py-3 rounded-xl font-semibold text-sm sm:text-xl hover:from-purple-600 hover:to-pink-600 transform hover:scale-105 transition-all duration-200 shadow-lg"
               >
                 🎯 Quiz
               </button>
               <button
                 onClick={nextLetter}
                 disabled={currentIndex === vietnameseAlphabet.length - 1}
-                className="flex items-center gap-2 bg-blue-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+                className="flex items-center gap-1 sm:gap-2 bg-blue-500 text-white px-3 py-1.5 sm:px-6 sm:py-3 rounded-xl font-semibold hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200 text-xs sm:text-base"
               >
                 Sau
-                <ArrowRight className="w-5 h-5" />
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
             </div>
           </div>
@@ -247,24 +248,24 @@ const AlphabetGame = ({ setGameState, score, setScore }) => {
           showMenu={showMenu}
           onMenuClick={onMenuClick}
         />
-        <main className={`transition-all duration-300 flex flex-col items-center justify-start w-full overflow-y-auto ${showMenu ? 'pl-44' : ''}`} style={{willChange: 'transform', height: 'calc(100vh - 56px - 32px)', marginTop: '56px'}}>
+        <main className={`transition-all duration-300 flex flex-col items-center justify-start w-full sm:overflow-y-auto overflow-hidden ${showMenu ? 'pl-44' : ''}`} style={{willChange: 'transform', height: 'calc(100vh - 56px - 32px)', marginTop: '56px'}}>
           <div className="max-w-4xl mx-auto w-full p-6 sm:p-8">
             {/* Stats and Back Button */}
             <div className="flex justify-between items-center mb-8">
               <button
                 onClick={resetGame}
-                className="flex items-center gap-2 bg-gradient-to-r from-blue-400 to-purple-400 text-white px-5 py-2.5 rounded-2xl font-bold shadow-md hover:from-blue-500 hover:to-purple-500 transition-all duration-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                className="flex items-center gap-1 sm:gap-2 bg-gradient-to-r from-blue-400 to-purple-400 text-white px-3 py-1.5 sm:px-5 sm:py-2.5 rounded-2xl font-bold shadow-md hover:from-blue-500 hover:to-purple-500 transition-all duration-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-300 text-xs sm:text-base"
               >
-                <ArrowLeft className="w-5 h-5" />
+                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
                 Học chữ cái
               </button>
               
-              <div className="flex gap-2 sm:gap-4">
-                <div className="bg-white px-2 py-1 sm:px-4 sm:py-2 rounded-lg shadow-md">
-                  <span className="font-semibold text-green-600 text-sm sm:text-base">Điểm: {gameScore}</span>
+              <div className="flex gap-1 sm:gap-4">
+                <div className="bg-white px-2 py-1 sm:px-4 sm:py-2 rounded-lg shadow-md min-w-[64px] sm:min-w-[100px]">
+                  <span className="font-semibold text-green-600 text-xs sm:text-base">Điểm: {gameScore}</span>
                 </div>
-                <div className="bg-white px-2 py-1 sm:px-4 sm:py-2 rounded-lg shadow-md">
-                  <span className="font-semibold text-blue-600 text-sm sm:text-base">Lần thử: {attempts}</span>
+                <div className="bg-white px-2 py-1 sm:px-4 sm:py-2 rounded-lg shadow-md min-w-[64px] sm:min-w-[100px]">
+                  <span className="font-semibold text-blue-600 text-xs sm:text-base">Lần thử: {attempts}</span>
                 </div>
               </div>
             </div>
@@ -323,6 +324,12 @@ const AlphabetGame = ({ setGameState, score, setScore }) => {
       </div>
     );
   }
+};
+
+AlphabetGame.propTypes = {
+  setGameState: PropTypes.func,
+  score: PropTypes.number,
+  setScore: PropTypes.func,
 };
 
 export default AlphabetGame; 

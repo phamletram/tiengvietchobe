@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { ArrowLeft, ArrowRight, Home, RotateCcw } from 'lucide-react';
+import { ArrowLeft, ArrowRight, RotateCcw } from 'lucide-react';
 import { ReactSketchCanvas } from 'react-sketch-canvas';
 import Header from './Header.jsx';
 import Menu from './Menu.jsx';
@@ -87,17 +87,33 @@ const AlphabetWritingGame = ({ setGameState }) => {
         onMenuClick={onMenuClick}
       />
       <main className={`transition-all duration-300 flex flex-col items-center justify-start w-full flex-1 min-h-0 ${showMenu ? 'pl-44' : ''}`} style={{willChange: 'transform', height: 'calc(100vh - 56px - 32px)', marginTop: '56px'}}>
-        <div className="max-w-2xl mx-auto w-full p-4 sm:p-6">
+        <div className="max-w-4xl mx-auto w-full p-4 sm:p-6">
           <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 mb-6">
-            <div className="bg-white bg-opacity-90 rounded-2xl shadow-lg p-2 md:p-4 relative flex items-center justify-center mx-auto w-full md:w-[420px] md:h-[420px] lg:w-[520px] lg:h-[520px] xl:w-[600px] xl:h-[600px] h-[220px]">
+            <div
+              className="bg-white bg-opacity-90 rounded-2xl shadow-lg p-2 md:p-4 relative flex items-center justify-center mx-auto w-full"
+              style={{
+                height: Math.min(
+                  window.innerWidth >= 1280 ? 480 :
+                  window.innerWidth >= 1024 ? 380 :
+                  window.innerWidth >= 768 ? 380 : 160,
+                  480
+                ),
+                maxHeight: 480
+              }}
+            >
               <ReactSketchCanvas
                 ref={canvasRef}
                 width="100%"
-                height={window.innerWidth >= 1280 ? 600 : window.innerWidth >= 1024 ? 520 : window.innerWidth >= 768 ? 420 : 200}
+                height={Math.min(
+                  window.innerWidth >= 1280 ? 480 :
+                  window.innerWidth >= 1024 ? 380 :
+                  window.innerWidth >= 768 ? 380 : 160,
+                  480
+                )}
                 strokeWidth={6}
                 strokeColor="#222"
                 backgroundColor="transparent"
-                style={{ borderRadius: 20, border: '2px solid #e0e0e0', background: 'rgba(255,255,255,0.7)', width: '100%', height: '100%' }}
+                style={{ borderRadius: 20, border: '2px solid #e0e0e0', background: 'rgba(255,255,255,0.7)', width: '100%', height: '100%', maxHeight: 480 }}
               />
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
                 <span className="font-normal text-blue-600 text-[22vw] md:text-[18rem] lg:text-[22rem]" style={{ fontFamily: '"Baloo 2", Arial, sans-serif', WebkitTextStroke: '1px #b3b3b3', opacity: 0.15 }}>
@@ -107,29 +123,29 @@ const AlphabetWritingGame = ({ setGameState }) => {
             </div>
           </div>
 
-          <div className="flex flex-nowrap justify-center gap-2 md:gap-4 mb-6 overflow-x-auto">
+          <div className="flex flex-nowrap justify-center gap-1 md:gap-4 mb-6 overflow-x-auto md:overflow-visible relative z-40">
             <button
               onClick={prevLetter}
               disabled={currentIndex === 0}
-              className="flex items-center gap-2 bg-blue-500 text-white px-3 py-2 md:px-6 md:py-3 rounded-xl font-semibold hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+              className="flex items-center gap-1 md:gap-2 bg-blue-500 text-white px-2 py-1 md:px-6 md:py-3 rounded-xl font-semibold hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200 text-xs md:text-base"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-4 h-4 md:w-5 md:h-5" />
               Trước
             </button>
             <button
               onClick={handleClear}
-              className="flex items-center gap-2 bg-gray-400 text-white px-3 py-2 md:px-6 md:py-3 rounded-xl font-semibold hover:bg-gray-500 transition-colors duration-200"
+              className="flex items-center gap-1 md:gap-2 bg-gray-400 text-white px-2 py-1 md:px-6 md:py-3 rounded-xl font-semibold hover:bg-gray-500 transition-colors duration-200 text-xs md:text-base"
             >
-              <RotateCcw className="w-5 h-5" />
+              <RotateCcw className="w-4 h-4 md:w-5 md:h-5" />
               Xóa
             </button>
             <button
               onClick={nextLetter}
               disabled={currentIndex === vietnameseAlphabet.length - 1}
-              className="flex items-center gap-2 bg-blue-500 text-white px-3 py-2 md:px-6 md:py-3 rounded-xl font-semibold hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
+              className="flex items-center gap-1 md:gap-2 bg-blue-500 text-white px-2 py-1 md:px-6 md:py-3 rounded-xl font-semibold hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200 text-xs md:text-base"
             >
               Sau
-              <ArrowRight className="w-5 h-5" />
+              <ArrowRight className="w-4 h-4 md:w-5 md:h-5" />
             </button>
           </div>
         </div>
