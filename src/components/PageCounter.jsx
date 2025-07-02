@@ -27,11 +27,11 @@ export default function PageCounter() {
 
   return (
     <div className="flex items-center gap-3">
-      <span className="flex items-center gap-1 text-yellow-700 font-bold text-lg" style={{fontFamily:'"Baloo 2", Arial, sans-serif'}}>
-        <Eye className="w-5 h-5 mr-1 text-blue-400" />
+      <span className="flex items-center gap-1 text-white font-semibold text-xl" style={{fontFamily:'\"Baloo 2\", Arial, sans-serif'}}>
+        <Eye className="w-5 h-5 mr-1 text-white" />
         {googleAnalyticsViews ?? '...'}
       </span>
-      <span className="flex items-center gap-1 text-yellow-700 font-bold text-lg" style={{fontFamily:'"Baloo 2", Arial, sans-serif'}}>
+      <span className="flex items-center gap-1 text-white font-semibold text-xl" style={{fontFamily:'\"Baloo 2\", Arial, sans-serif'}}>
         <span className="text-lg mr-1">☀️</span>
         {todayViews ?? '...'}
       </span>

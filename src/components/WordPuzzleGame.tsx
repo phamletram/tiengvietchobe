@@ -1,7 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Shuffle, RotateCcw, Trophy, Clock, Target, CheckCircle, XCircle, Home, Shuffle as ShuffleIcon } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Shuffle, RotateCcw, Trophy, Clock, Target, CheckCircle, XCircle, Shuffle as ShuffleIcon } from 'lucide-react';
 import { lessons } from '../data/lessons.js';
-import HeaderBar from './HeaderBar.jsx';
+import Header from './Header.jsx';
+import Menu from './Menu.jsx';
+import Footer from './Footer.jsx';
+import { handleMenuClick } from '../utils/menuUtils.js';
+import { useResponsiveMenu } from '../hooks/useResponsiveMenu.js';
 
 interface Word {
   vietnamese: string;
@@ -41,6 +45,7 @@ interface WordPuzzleGameProps {
 const WordPuzzleGame: React.FC<WordPuzzleGameProps> = ({ setGameState, score, setScore }) => {
   // Chế độ chơi: 'puzzle' (ghép chữ) hoặc 'card' (lật thẻ)
   const [mode] = useState<'puzzle'>('puzzle');
+  const { showMenu, setShowMenu } = useResponsiveMenu();
 
   // State chọn bài học
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
@@ -72,7 +77,7 @@ const WordPuzzleGame: React.FC<WordPuzzleGameProps> = ({ setGameState, score, se
   // Âm thanh hiệu ứng
   const audioCtxRef = useRef<AudioContext | null>(null);
   if (!audioCtxRef.current && typeof window !== 'undefined') {
-    audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
+    audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
   }
   const playSound = (type: 'correct' | 'incorrect') => {
     if (!audioCtxRef.current) return;
@@ -371,47 +376,69 @@ const WordPuzzleGame: React.FC<WordPuzzleGameProps> = ({ setGameState, score, se
 
   // --- UI chọn bài học ---
   if (!gameStarted && !gameCompleted) {
+    const onMenuClick = (menuKey: string) => {
+      if (setGameState) {
+        handleMenuClick(menuKey, setShowMenu, setGameState);
+      }
+    };
+    
     return (
-      <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-400 via-purple-400 to-pink-400 font-inter">
-        <HeaderBar
+      <div className="h-screen flex flex-col font-inter relative overflow-hidden" style={{background: 'linear-gradient(135deg, #e0f7fa 0%, #f3e8ff 100%)'}}>
+        <Header 
           title="Game xếp chữ"
-          score={0}
-          onHomeClick={() => setGameState ? setGameState('menu') : undefined}
-          homeIcon={Home}
+          showMenu={showMenu}
+          onMenuToggle={() => setShowMenu(show => !show)}
         />
-        
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-7xl w-full p-6 sm:p-8">
-          {lessons.map((lesson, idx) => (
-            <button
-              key={lesson.title}
-              className={`group bg-white rounded-3xl p-6 sm:p-8 shadow-xl cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-blue-300 active:scale-100 ${idx === currentLessonIndex ? 'ring-4 ring-purple-400' : ''}`}
-              onClick={() => setCurrentLessonIndex(idx)}
-            >
-              <div className="text-7xl mb-4 text-center group-hover:animate-bounce-y">
-                {lesson.icon}
-              </div>
-              <h3 className="text-2xl sm:text-2xl font-bold text-gray-800 text-center mb-1">{lesson.title}</h3>
-              <p className="text-gray-600 text-center text-sm">{lesson.words.length} từ vựng</p>
-            </button>
-          ))}
-        </div>
+        <Menu 
+          showMenu={showMenu}
+          onMenuClick={onMenuClick}
+        />
+        {/* Main content */}
+        <main className={`transition-all duration-300 flex flex-col items-center justify-start w-full overflow-y-auto ${showMenu ? 'pl-44' : ''}`} style={{willChange: 'transform', height: 'calc(100vh - 56px - 32px)', marginTop: '56px'}}>
+          <div className="grid grid-cols-3 gap-6 max-w-6xl w-full p-6 sm:p-8">
+            {lessons.map((lesson, idx) => (
+              <button
+                key={lesson.title}
+                className={`group bg-white rounded-3xl p-6 sm:p-8 shadow-xl cursor-pointer transform transition-all duration-300 hover:scale-105 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-blue-300 active:scale-100 ${idx === currentLessonIndex ? 'ring-4 ring-purple-400' : ''}`}
+                onClick={() => setCurrentLessonIndex(idx)}
+              >
+                <div className="text-7xl mb-4 text-center group-hover:animate-bounce-y">
+                  {lesson.icon}
+                </div>
+                <h3 className="text-2xl sm:text-2xl font-bold text-gray-800 text-center mb-1">{lesson.title}</h3>
+                <p className="text-gray-600 text-center text-sm">{lesson.words.length} từ vựng</p>
+              </button>
+            ))}
+          </div>
+        </main>
+        <Footer score={score} lives={3} />
       </div>
     );
   }
 
   // --- UI chế độ puzzle (ghép chữ) ---
   if (mode === 'puzzle') {
+    const onMenuClick = (menuKey: string) => {
+      if (setGameState) {
+        handleMenuClick(menuKey, setShowMenu, setGameState);
+      }
+    };
+    
     return (
-      <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-400 via-purple-400 to-pink-400 font-inter">
-        <HeaderBar
+      <div className="h-screen flex flex-col font-inter relative overflow-hidden" style={{background: 'linear-gradient(135deg, #e0f7fa 0%, #f3e8ff 100%)'}}>
+        <Header 
           title={`🧩 Xếp chữ - ${sampleLesson.title}`}
-          score={gameScore}
-          onHomeClick={() => setGameState ? setGameState('menu') : undefined}
-          homeIcon={Home}
+          showMenu={showMenu}
+          onMenuToggle={() => setShowMenu(show => !show)}
+        />
+        <Menu 
+          showMenu={showMenu}
+          onMenuClick={onMenuClick}
         />
 
-        <div className="flex-1 p-6 sm:p-8">
-          <div className="max-w-4xl mx-auto">
+        {/* Main content */}
+        <main className={`transition-all duration-300 flex flex-col items-center justify-start w-full overflow-y-auto ${showMenu ? 'pl-44' : ''}`} style={{willChange: 'transform', height: 'calc(100vh - 56px - 32px)', marginTop: '56px'}}>
+          <div className="flex flex-col items-center justify-center p-6 sm:p-8 w-full max-w-4xl">
             {/* Game Stats */}
             {gameStarted && (
               <div className="flex justify-center gap-4 mb-6 flex-wrap">
@@ -542,7 +569,8 @@ const WordPuzzleGame: React.FC<WordPuzzleGameProps> = ({ setGameState, score, se
               </div>
             )}
           </div>
-        </div>
+        </main>
+        <Footer score={score} lives={3} />
       </div>
     );
   }

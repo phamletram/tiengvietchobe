@@ -1,6 +1,10 @@
 import React, { useState, useRef } from 'react';
-import { Home, CheckCircle, XCircle, RotateCcw, ArrowLeft, ArrowRight, Volume2 } from 'lucide-react';
-import HeaderBar from './HeaderBar.jsx';
+import { CheckCircle, XCircle, RotateCcw, ArrowLeft, ArrowRight, Volume2 } from 'lucide-react';
+import Header from './Header.jsx';
+import Menu from './Menu.jsx';
+import Footer from './Footer.jsx';
+import { handleMenuClick } from '../utils/menuUtils.js';
+import { useResponsiveMenu } from '../hooks/useResponsiveMenu.js';
 
 const vietnameseAlphabet = [
   { letter: 'A', smallLetter: 'a', pronunciation: 'a', example: 'áo', exampleMeaning: 'shirt' },
@@ -43,6 +47,7 @@ const AlphabetGame = ({ setGameState, score, setScore }) => {
   const [isCorrect, setIsCorrect] = useState(null);
   const [quizOptions, setQuizOptions] = useState([]);
   const [currentQuiz, setCurrentQuiz] = useState(null);
+  const { showMenu, setShowMenu } = useResponsiveMenu();
 
   const audioCtxRef = useRef(null);
   if (!audioCtxRef.current && typeof window !== 'undefined') {
@@ -139,19 +144,27 @@ const AlphabetGame = ({ setGameState, score, setScore }) => {
     setIsCorrect(null);
   };
 
+  const onMenuClick = (menuKey) => {
+    if (setGameState) {
+      handleMenuClick(menuKey, setShowMenu, setGameState);
+    }
+  };
+
   // Learn Mode UI
   if (gameMode === 'learn') {
     return (
-      <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-400 via-purple-400 to-pink-400 font-inter">
-        <HeaderBar
+      <div className="h-screen flex flex-col font-inter relative overflow-hidden" style={{background: 'linear-gradient(135deg, #e0f7fa 0%, #f3e8ff 100%)'}}>
+        <Header
           title="📝 Học chữ cái"
-          score={0}
-          onHomeClick={() => setGameState ? setGameState('menu') : undefined}
-          homeIcon={Home}
+          showMenu={showMenu}
+          onMenuToggle={() => setShowMenu(show => !show)}
         />
-
-        <div className="flex-1 p-6 sm:p-8">
-          <div className="max-w-4xl mx-auto">
+        <Menu
+          showMenu={showMenu}
+          onMenuClick={onMenuClick}
+        />
+        <main className={`transition-all duration-300 flex flex-col items-center justify-start w-full overflow-y-auto ${showMenu ? 'pl-44' : ''}`} style={{willChange: 'transform', height: 'calc(100vh - 56px - 32px)', marginTop: '56px'}}>
+          <div className="max-w-4xl mx-auto w-full p-6 sm:p-8">
             {/* Letter Display */}
             <div className="bg-white rounded-2xl shadow-xl p-12 mb-8 relative">
               {/* Progress - góc trái */}
@@ -215,85 +228,101 @@ const AlphabetGame = ({ setGameState, score, setScore }) => {
               </button>
             </div>
           </div>
-        </div>
+        </main>
+        <Footer score={score} lives={3} />
       </div>
     );
   }
 
   // Quiz Mode UI
-  return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-blue-400 via-purple-400 to-pink-400 font-inter">
-      <HeaderBar
-        title="🎯 Quiz chữ cái"
-        score={gameScore}
-        onHomeClick={resetGame}
-        homeIcon={RotateCcw}
-      />
-
-      <div className="flex-1 p-6 sm:p-8">
-        <div className="max-w-4xl mx-auto">
-          {/* Stats */}
-          <div className="flex justify-center gap-4 mb-8">
-            <div className="bg-white px-4 py-2 rounded-lg shadow-md">
-              <span className="font-semibold text-green-600">Điểm: {gameScore}</span>
-            </div>
-            <div className="bg-white px-4 py-2 rounded-lg shadow-md">
-              <span className="font-semibold text-blue-600">Lần thử: {attempts}</span>
-            </div>
-          </div>
-
-          {/* Quiz Question */}
-          <div className="bg-white rounded-2xl shadow-xl p-12 mb-8">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-800 mb-4">
-                Chọn chữ cái bắt đầu của từ: <span className="text-purple-600">{currentQuiz?.example}</span>
-              </h2>
-            </div>
-
-            {/* Options */}
-            <div className="grid grid-cols-2 gap-4">
-              {quizOptions.map((option, index) => (
-                <button
-                  key={index}
-                  onClick={() => checkAnswer(option)}
-                  disabled={showResult}
-                  className={`p-6 rounded-xl text-4xl font-bold transition-all duration-200 ${
-                    showResult
-                      ? option.letter === currentQuiz.letter
-                        ? 'bg-green-100 border-2 border-green-400 text-green-700'
-                        : 'bg-red-100 border-2 border-red-400 text-red-700'
-                      : 'bg-blue-100 hover:bg-blue-200 text-blue-700 hover:scale-105'
-                  }`}
-                >
-                  <div className="flex justify-center items-center gap-2">
-                    <span>{option.letter}</span>
-                    <span className="text-2xl text-gray-500">{option.smallLetter}</span>
-                  </div>
-                </button>
-              ))}
-            </div>
-
-            {/* Result */}
-            {showResult && (
-              <div className="text-center mt-6">
-                {isCorrect ? (
-                  <div className="flex items-center justify-center gap-2 text-green-600">
-                    <CheckCircle className="w-8 h-8" />
-                    <span className="text-2xl font-bold">Chính xác! 🎉</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center gap-2 text-red-600">
-                    <XCircle className="w-8 h-8" />
-                    <span className="text-2xl font-bold">Sai rồi! Đáp án đúng là: {currentQuiz.letter}</span>
-                  </div>
-                )}
+  if (gameMode === 'quiz') {
+    return (
+      <div className="h-screen flex flex-col font-inter relative overflow-hidden" style={{background: 'linear-gradient(135deg, #e0f7fa 0%, #f3e8ff 100%)'}}>
+        <Header
+          title="🎯 Quiz chữ cái"
+          showMenu={showMenu}
+          onMenuToggle={() => setShowMenu(show => !show)}
+        />
+        <Menu
+          showMenu={showMenu}
+          onMenuClick={onMenuClick}
+        />
+        <main className={`transition-all duration-300 flex flex-col items-center justify-start w-full overflow-y-auto ${showMenu ? 'pl-44' : ''}`} style={{willChange: 'transform', height: 'calc(100vh - 56px - 32px)', marginTop: '56px'}}>
+          <div className="max-w-4xl mx-auto w-full p-6 sm:p-8">
+            {/* Stats and Back Button */}
+            <div className="flex justify-between items-center mb-8">
+              <button
+                onClick={resetGame}
+                className="flex items-center gap-2 bg-gradient-to-r from-blue-400 to-purple-400 text-white px-5 py-2.5 rounded-2xl font-bold shadow-md hover:from-blue-500 hover:to-purple-500 transition-all duration-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-300"
+              >
+                <ArrowLeft className="w-5 h-5" />
+                Học chữ cái
+              </button>
+              
+              <div className="flex gap-2 sm:gap-4">
+                <div className="bg-white px-2 py-1 sm:px-4 sm:py-2 rounded-lg shadow-md">
+                  <span className="font-semibold text-green-600 text-sm sm:text-base">Điểm: {gameScore}</span>
+                </div>
+                <div className="bg-white px-2 py-1 sm:px-4 sm:py-2 rounded-lg shadow-md">
+                  <span className="font-semibold text-blue-600 text-sm sm:text-base">Lần thử: {attempts}</span>
+                </div>
               </div>
-            )}
+            </div>
+
+            {/* Quiz Question */}
+            <div className="bg-white rounded-2xl shadow-xl p-12 mb-8">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-gray-800 mb-4">
+                  Chọn chữ cái bắt đầu của từ: <span className="text-purple-600">{currentQuiz?.example}</span>
+                </h2>
+              </div>
+
+              {/* Options */}
+              <div className="grid grid-cols-2 gap-4">
+                {quizOptions.map((option, index) => (
+                  <button
+                    key={index}
+                    onClick={() => checkAnswer(option)}
+                    disabled={showResult}
+                    className={`p-6 rounded-xl text-4xl font-bold transition-all duration-200 ${
+                      showResult
+                        ? option.letter === currentQuiz.letter
+                          ? 'bg-green-100 border-2 border-green-400 text-green-700'
+                          : 'bg-red-100 border-2 border-red-400 text-red-700'
+                        : 'bg-blue-100 hover:bg-blue-200 text-blue-700 hover:scale-105'
+                    }`}
+                  >
+                    <div className="flex justify-center items-center gap-2">
+                      <span>{option.letter}</span>
+                      <span className="text-2xl text-gray-500">{option.smallLetter}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              {/* Result */}
+              {showResult && (
+                <div className="text-center mt-6">
+                  {isCorrect ? (
+                    <div className="flex items-center justify-center gap-2 text-green-600">
+                      <CheckCircle className="w-8 h-8" />
+                      <span className="text-2xl font-bold">Chính xác! 🎉</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center gap-2 text-red-600">
+                      <XCircle className="w-8 h-8" />
+                      <span className="text-2xl font-bold">Sai rồi! Đáp án đúng là: {currentQuiz.letter}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        </main>
+        <Footer score={score} lives={3} />
       </div>
-    </div>
-  );
+    );
+  }
 };
 
 export default AlphabetGame; 

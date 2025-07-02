@@ -1,12 +1,12 @@
 // App.js - Main component
 import React, { useState, useEffect } from 'react';
-import MenuScreen from './components/MenuScreen.jsx';
+import MainScreen from './components/MainScreen.jsx';
 import LessonScreen from './components/LessonScreen.jsx';
 import QuizScreen from './components/QuizScreen.jsx';
 import CompleteScreen from './components/CompleteScreen.jsx';
 import GameOverScreen from './components/GameOverScreen.jsx';
 import TopicWordScreen from './components/TopicWordsScreen.jsx';
-import GameScreen from './components/GameScreen.jsx';
+import FlipGameScreen from './components/FlipGameScreen.jsx';
 import WordPuzzleGame from './components/WordPuzzleGame.tsx';
 import AlphabetGame from './components/AlphabetGame.jsx';
 import AlphabetWritingGame from './components/AlphabetWritingGame.jsx';
@@ -23,7 +23,7 @@ const VietnameseLearningApp = () => {
     return savedScore ? parseInt(savedScore, 10) : 0;
   });
   const [lives, setLives] = useState(3);
-  const [gameState, setGameState] = useState('menu'); // menu, lesson, quiz, complete
+  const [gameState, setGameState] = useState('topic');
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [showResult, setShowResult] = useState(false);
 
@@ -77,7 +77,7 @@ const VietnameseLearningApp = () => {
     setCurrentWord(0);
     //resetScore();
     setLives(3);
-    setGameState('menu');
+    setGameState('main');
     setSelectedAnswer(null);
     setShowResult(false);
   };
@@ -115,8 +115,8 @@ const VietnameseLearningApp = () => {
 
   // Main render logic
   switch (gameState) {
-    case 'menu':
-      return <MenuScreen {...screenProps} />;
+    case 'main':
+      return <MainScreen {...screenProps} />;
     case 'topic':
       return <TopicWordScreen {...screenProps} />;
     case 'lesson':
@@ -125,8 +125,8 @@ const VietnameseLearningApp = () => {
       return <QuizScreen {...screenProps} />;
     case 'complete':
       return <CompleteScreen {...screenProps} />;
-    case 'game':
-      return <GameScreen {...screenProps} />;
+    case 'flipgame':
+      return <FlipGameScreen {...screenProps} />;
     case 'puzzlegame':
         return <WordPuzzleGame {...screenProps} />;
     case 'alphabet':
@@ -134,7 +134,7 @@ const VietnameseLearningApp = () => {
     case 'writing':
       return <AlphabetWritingGame {...screenProps} />;
     default:
-      return <MenuScreen {...screenProps} />;
+      return <MainScreen {...screenProps} />;
   }
 };
 
