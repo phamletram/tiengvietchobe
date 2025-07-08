@@ -5,42 +5,44 @@ import Footer from './Footer.jsx';
 import { useResponsiveMenu } from '../hooks/useResponsiveMenu.js';
 import { useFullscreen } from './Header.jsx';
 import PropTypes from 'prop-types';
-
-const alphabetItems = [
-  {
-    key: 'alphabet',
-    label: 'Làm quen chữ cái',
-    icon: '🔤',
-    desc: 'Nhận diện và học chữ cái tiếng Việt',
-  },
-  {
-    key: 'writing',
-    label: 'Tập viết chữ cái',
-    icon: '✍️',
-    desc: 'Luyện viết chữ cái tiếng Việt',
-  },
-  {
-    key: 'vowel-consonant',
-    label: 'Nguyên âm – Phụ âm',
-    icon: '🔡',
-    desc: 'Nguyên âm và phụ âm tiếng Việt',
-  },
-  {
-    key: 'sort-vowel-consonant',
-    label: 'Phân loại nguyên âm – phụ âm',
-    icon: '🧩',
-    desc: 'Kéo thả chữ cái vào đúng nhóm',
-  },
-];
+import { useTranslation } from 'react-i18next';
 
 const AlphabetIntroScreen = ({ setGameState, score }) => {
+  const { t } = useTranslation();
   const { showMenu, setShowMenu } = useResponsiveMenu(true);
   const { isFullscreen } = useFullscreen() || {};
+
+  const alphabetItems = [
+    {
+      key: 'alphabet',
+      label: t('alphabet_intro.title'),
+      icon: '🔤',
+      desc: t('alphabet_intro.desc'),
+    },
+    {
+      key: 'writing',
+      label: t('alphabet_intro.writing'),
+      icon: '✍️',
+      desc: t('alphabet_intro.writing_desc'),
+    },
+    {
+      key: 'vowel-consonant',
+      label: t('alphabet_intro.vowel_consonant'),
+      icon: '🔡',
+      desc: t('alphabet_intro.vowel_consonant_desc'),
+    },
+    {
+      key: 'sort-vowel-consonant',
+      label: t('alphabet_intro.sort'),
+      icon: '🧩',
+      desc: t('alphabet_intro.sort_desc'),
+    },
+  ];
 
   return (
     <div className="h-screen flex flex-col font-inter relative overflow-hidden" style={{background: 'linear-gradient(135deg, #e0f7fa 0%, #f3e8ff 100%)'}}>
       <Header
-        title="Làm quen chữ cái"
+        title={t('alphabet_intro.title')}
         showMenu={showMenu}
         onMenuToggle={() => setShowMenu(show => !show)}
       />

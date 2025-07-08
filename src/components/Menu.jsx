@@ -1,43 +1,43 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+import PropTypes from 'prop-types';
 
 const Menu = ({ 
   showMenu, 
-  onMenuToggle,
   onMenuClick 
 }) => {
+  const { t } = useTranslation();
   const stations = [
-    
     {
       key: 'home',
-      label: 'Trang chủ',
+      label: t('menu.home'),
       icon: '🏠',
       color: 'from-green-200 to-blue-200',
     },
     {
       key: 'alphabet-intro',
-      label: 'Chữ cái',
+      label: t('menu.alphabet'),
       icon: '🔤',
       color: 'from-yellow-200 to-pink-200',
     },
     {
       key: 'topic',
-      label: 'Từ vựng',
+      label: t('menu.topic'),
       icon: '📚',
       color: 'from-pink-300 to-yellow-200',
     },
     {
       key: 'flipgame',
-      label: 'Lật thẻ',
+      label: t('menu.flipgame'),
       icon: '📟',
       color: 'from-blue-200 to-pink-200',
     },
     {
       key: 'puzzlegame',
-      label: 'Xếp chữ',
+      label: t('menu.puzzlegame'),
       icon: '🧩',
       color: 'from-yellow-200 to-blue-200',
     },
-  
   ];
 
   return (
@@ -47,17 +47,38 @@ const Menu = ({
         {stations.map((station) => (
           <div
             key={station.key}
-            className="flex flex-row items-center gap-3 w-full px-4 py-2 text-lg font-semibold justify-start text-left pl-2 transition-all duration-200 rounded-lg hover:bg-green-100 hover:scale-105 hover:shadow-md cursor-pointer"
+            className="flex flex-row items-center gap-1 w-full px-4 py-2 text-lg font-semibold justify-start text-left pl-2 transition-all duration-200 rounded-lg hover:bg-green-100 hover:scale-105 hover:shadow-md cursor-pointer"
             style={{fontFamily:'"Baloo 2", Arial, sans-serif'}}
             onClick={() => onMenuClick(station.key)}
           >
-            <span className="text-2xl">{station.icon}</span>
-            <span className="text-pink-700 drop-shadow-sm">{station.label}</span>
+            <span className="text-xl">{station.icon}</span>
+            <span
+              className="text-pink-700 drop-shadow-sm w-0 flex-1 max-w-full overflow-hidden text-sm sm:text-lg"
+              style={{
+                display: 'inline-block',
+                whiteSpace: 'nowrap',
+                fontSize: 'clamp(0.40rem, 1.8vw, 1.125rem)',
+                lineHeight: 1.1,
+                
+                overflow: 'hidden',
+                // fit toàn bộ chữ nếu có thể
+                WebkitTextSizeAdjust: '100%',
+                MozTextSizeAdjust: '100%',
+                msTextSizeAdjust: '100%',
+              }}
+            >
+              {station.label}
+            </span>
           </div>
         ))}
       </div>
     </div>
   );
+};
+
+Menu.propTypes = {
+  showMenu: PropTypes.bool,
+  onMenuClick: PropTypes.func.isRequired,
 };
 
 export default Menu; 

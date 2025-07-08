@@ -5,6 +5,7 @@ import Menu from './Menu.jsx';
 import Footer from './Footer.jsx';
 import { useResponsiveMenu } from '../hooks/useResponsiveMenu.js';
 import { useFullscreen } from './Header.jsx';
+import { useTranslation } from 'react-i18next';
 import {
   DndContext,
   useDraggable,
@@ -26,6 +27,7 @@ function shuffle(array) {
 }
 
 const AlphabetSortGame = ({ score, setScore, setGameState }) => {
+  const { t } = useTranslation();
   const { showMenu, setShowMenu } = useResponsiveMenu(true);
   const { isFullscreen } = useFullscreen() || {};
   const [letters, setLetters] = useState(
@@ -124,7 +126,7 @@ const AlphabetSortGame = ({ score, setScore, setGameState }) => {
   return (
     <div className="h-screen flex flex-col font-inter relative overflow-hidden" style={{background: 'linear-gradient(135deg, #e0f7fa 0%, #f3e8ff 100%)'}}>
       <Header
-        title="Phân loại nguyên âm – phụ âm"
+        title={t('sort_game.title')}
         showMenu={showMenu}
         onMenuToggle={() => setShowMenu(show => !show)}
       />
@@ -144,13 +146,13 @@ const AlphabetSortGame = ({ score, setScore, setGameState }) => {
             <div className="flex flex-col md:flex-row gap-8 items-start justify-center">
               <DropBox
                 id="vowel"
-                label="Nguyên âm"
+                label={t('sort_game.vowel')}
                 letters={letters.filter(l => l.box === 'vowel')}
                 onBack={handleBackToList}
               />
               <DropBox
                 id="consonant"
-                label="Phụ âm"
+                label={t('sort_game.consonant')}
                 letters={letters.filter(l => l.box === 'consonant')}
                 onBack={handleBackToList}
               />
@@ -169,8 +171,8 @@ const AlphabetSortGame = ({ score, setScore, setGameState }) => {
           </DndContext>
           {/* Feedback */}
           {(feedback || showCongrats) && (
-            <div className={`mt-6 text-2xl font-bold text-center ${feedback === 'Đúng rồi!' || showCongrats ? 'text-green-600' : 'text-red-500'}`}>
-              {showCongrats ? 'Đúng tất cả rồi!' : feedback}
+            <div className={`mt-6 text-2xl font-bold text-center ${feedback === t('sort_game.correct') || showCongrats ? 'text-green-600' : 'text-red-500'}`}>
+              {showCongrats ? t('sort_game.all_correct') : feedback === 'Đúng rồi!' ? t('sort_game.correct') : feedback === 'Sai rồi!' ? t('sort_game.wrong') : feedback}
             </div>
           )}
           <div className="flex justify-center mt-8">
@@ -178,7 +180,7 @@ const AlphabetSortGame = ({ score, setScore, setGameState }) => {
               onClick={handleReset}
               className="bg-gradient-to-r from-blue-400 to-purple-500 text-white px-6 py-2 rounded-xl font-semibold hover:from-blue-500 hover:to-purple-600 transform hover:scale-105 transition-all duration-200 shadow-lg"
             >
-              Làm lại
+              {t('sort_game.reset')}
             </button>
           </div>
         </div>

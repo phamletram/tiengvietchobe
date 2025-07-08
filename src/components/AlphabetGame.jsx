@@ -7,6 +7,7 @@ import { handleMenuClick } from '../utils/menuUtils.js';
 import { useResponsiveMenu } from '../hooks/useResponsiveMenu.js';
 import PropTypes from 'prop-types';
 import { useFullscreen } from './Header.jsx';
+import { useTranslation } from 'react-i18next';
 
 const vietnameseAlphabet = [
   { letter: 'A', smallLetter: 'a', pronunciation: 'a', example: 'áo', exampleMeaning: 'shirt' },
@@ -41,6 +42,7 @@ const vietnameseAlphabet = [
 ];
 
 const AlphabetGame = ({ setGameState, score, setScore }) => {
+  const { t } = useTranslation();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [gameMode, setGameMode] = useState('learn'); // 'learn' or 'quiz'
   const [gameScore, setGameScore] = useState(0); // Local game score
@@ -158,7 +160,7 @@ const AlphabetGame = ({ setGameState, score, setScore }) => {
     return (
       <div className="h-screen flex flex-col font-inter relative overflow-hidden" style={{background: 'linear-gradient(135deg, #e0f7fa 0%, #f3e8ff 100%)'}}>
         <Header
-          title="📝 Học chữ cái"
+          title={t('alphabet_game.title')}
           showMenu={showMenu}
           onMenuToggle={() => setShowMenu(show => !show)}
         />
@@ -174,7 +176,7 @@ const AlphabetGame = ({ setGameState, score, setScore }) => {
             <button
               onClick={() => setHeaderIsFullscreen(false)}
               className="absolute top-4 right-4 z-50 p-2 rounded-full bg-blue-100 hover:bg-blue-200 transition-colors"
-              title="Thoát toàn màn hình"
+              title={t('alphabet_game.finish')}
             >
               <Minimize className="w-6 h-6 text-blue-600" />
             </button>
@@ -190,7 +192,6 @@ const AlphabetGame = ({ setGameState, score, setScore }) => {
                   </span>
                 </div>
               </div>
-              
               <div className="text-center">
                 <div className="flex justify-center items-center gap-8 mb-6">
                   <div className="text-9xl font-bold text-blue-600">
@@ -200,46 +201,31 @@ const AlphabetGame = ({ setGameState, score, setScore }) => {
                     {currentLetter.smallLetter}
                   </div>
                 </div>
-                <div className="flex justify-center items-center gap-4 mb-6">
-                  <button
-                    onClick={playLetterSound}
-                    className="p-3 bg-blue-100 hover:bg-blue-200 rounded-full transition-colors duration-200"
-                    title="Nghe phát âm"
-                  >
-                    <Volume2 className="w-8 h-8 text-blue-600" />
+                <div className="text-lg font-semibold text-gray-700 mb-2">
+                  {t('alphabet_game.pronunciation')}: {currentLetter.pronunciation}
+                </div>
+                <div className="flex justify-center gap-4 mb-4">
+                  <button onClick={prevLetter} disabled={currentIndex === 0} className="px-4 py-2 rounded-lg bg-blue-100 text-blue-700 font-bold disabled:opacity-50">
+                    <ArrowLeft className="inline w-5 h-5 mr-1" />{t('alphabet_game.prev')}
+                  </button>
+                  <button onClick={playLetterSound} className="px-4 py-2 rounded-lg bg-yellow-100 text-yellow-700 font-bold">
+                    <Volume2 className="inline w-5 h-5 mr-1" />{t('alphabet_game.listen')}
+                  </button>
+                  <button onClick={nextLetter} disabled={currentIndex === vietnameseAlphabet.length - 1} className="px-4 py-2 rounded-lg bg-blue-100 text-blue-700 font-bold disabled:opacity-50">
+                    {t('alphabet_game.next')}<ArrowRight className="inline w-5 h-5 ml-1" />
                   </button>
                 </div>
-                <div className="text-2xl text-gray-600 mb-6">
-                  Ví dụ: <span className="font-semibold text-purple-600">{currentLetter.example}</span>
-                  <span className="text-gray-500 ml-4">•</span>
-                  <span className="text-gray-500 ml-4">Nghĩa: {currentLetter.exampleMeaning}</span>
+                <div className="text-base text-gray-600 mb-2">
+                  <span className="font-semibold text-gray-800">{t('alphabet_game.example')}:</span> {currentLetter.example} <span className="ml-2 font-semibold text-gray-800">{t('alphabet_game.meaning')}:</span> {currentLetter.exampleMeaning}
                 </div>
               </div>
             </div>
-
-            {/* Navigation */}
-            <div className="flex justify-center gap-2 sm:gap-4 mb-8">
-              <button
-                onClick={prevLetter}
-                disabled={currentIndex === 0}
-                className="flex items-center gap-1 sm:gap-2 bg-blue-500 text-white px-3 py-1.5 sm:px-6 sm:py-3 rounded-xl font-semibold hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200 text-xs sm:text-base"
-              >
-                <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
-                Trước
+            <div className="flex justify-between mt-4">
+              <button onClick={startQuiz} className="bg-gradient-to-r from-blue-400 to-purple-500 text-white px-6 py-2 rounded-xl font-semibold hover:from-blue-500 hover:to-purple-600 transform hover:scale-105 transition-all duration-200 shadow-lg">
+                {t('alphabet_game.start_quiz')}
               </button>
-              <button
-                onClick={startQuiz}
-                className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-1.5 sm:px-8 sm:py-3 rounded-xl font-semibold text-sm sm:text-xl hover:from-purple-600 hover:to-pink-600 transform hover:scale-105 transition-all duration-200 shadow-lg"
-              >
-                🎯 Quiz
-              </button>
-              <button
-                onClick={nextLetter}
-                disabled={currentIndex === vietnameseAlphabet.length - 1}
-                className="flex items-center gap-1 sm:gap-2 bg-blue-500 text-white px-3 py-1.5 sm:px-6 sm:py-3 rounded-xl font-semibold hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200 text-xs sm:text-base"
-              >
-                Sau
-                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+              <button onClick={resetGame} className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300">
+                {t('alphabet_game.reset')}
               </button>
             </div>
           </div>
@@ -254,7 +240,7 @@ const AlphabetGame = ({ setGameState, score, setScore }) => {
     return (
       <div className="h-screen flex flex-col font-inter relative overflow-hidden" style={{background: 'linear-gradient(135deg, #e0f7fa 0%, #f3e8ff 100%)'}}>
         <Header
-          title="🎯 Quiz chữ cái"
+          title={t('alphabet_game.quiz_title')}
           showMenu={showMenu}
           onMenuToggle={() => setShowMenu(show => !show)}
         />
@@ -270,7 +256,7 @@ const AlphabetGame = ({ setGameState, score, setScore }) => {
             <button
               onClick={() => setHeaderIsFullscreen(false)}
               className="absolute top-4 right-4 z-50 p-2 rounded-full bg-blue-100 hover:bg-blue-200 transition-colors"
-              title="Thoát toàn màn hình"
+              title={t('alphabet_game.finish')}
             >
               <Minimize className="w-6 h-6 text-blue-600" />
             </button>
@@ -283,15 +269,15 @@ const AlphabetGame = ({ setGameState, score, setScore }) => {
                 className="flex items-center gap-1 sm:gap-2 bg-gradient-to-r from-blue-400 to-purple-400 text-white px-3 py-1.5 sm:px-5 sm:py-2.5 rounded-2xl font-bold shadow-md hover:from-blue-500 hover:to-purple-500 transition-all duration-200 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-300 text-xs sm:text-base"
               >
                 <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
-                Học chữ cái
+                {t('alphabet_game.learn_title')}
               </button>
               
               <div className="flex gap-1 sm:gap-4">
                 <div className="bg-white px-2 py-1 sm:px-4 sm:py-2 rounded-lg shadow-md min-w-[64px] sm:min-w-[100px]">
-                  <span className="font-semibold text-green-600 text-xs sm:text-base">Điểm: {gameScore}</span>
+                  <span className="font-semibold text-green-600 text-xs sm:text-base">{t('alphabet_game.score')}: {gameScore}</span>
                 </div>
                 <div className="bg-white px-2 py-1 sm:px-4 sm:py-2 rounded-lg shadow-md min-w-[64px] sm:min-w-[100px]">
-                  <span className="font-semibold text-blue-600 text-xs sm:text-base">Lần thử: {attempts}</span>
+                  <span className="font-semibold text-blue-600 text-xs sm:text-base">{t('alphabet_game.attempts')}: {attempts}</span>
                 </div>
               </div>
             </div>
@@ -300,7 +286,7 @@ const AlphabetGame = ({ setGameState, score, setScore }) => {
             <div className="bg-white rounded-2xl shadow-xl p-12 mb-8">
               <div className="text-center mb-8">
                 <h2 className="text-3xl font-bold text-gray-800 mb-4">
-                  Chọn chữ cái bắt đầu của từ: <span className="text-purple-600">{currentQuiz?.example}</span>
+                  {t('alphabet_game.quiz_question_title')} <span className="text-purple-600">{currentQuiz?.example}</span>
                 </h2>
               </div>
 
@@ -333,12 +319,12 @@ const AlphabetGame = ({ setGameState, score, setScore }) => {
                   {isCorrect ? (
                     <div className="flex items-center justify-center gap-2 text-green-600">
                       <CheckCircle className="w-8 h-8" />
-                      <span className="text-2xl font-bold">Chính xác! 🎉</span>
+                      <span className="text-2xl font-bold">{t('alphabet_game.correct_feedback')}</span>
                     </div>
                   ) : (
                     <div className="flex items-center justify-center gap-2 text-red-600">
                       <XCircle className="w-8 h-8" />
-                      <span className="text-2xl font-bold">Sai rồi! Đáp án đúng là: {currentQuiz.letter}</span>
+                      <span className="text-2xl font-bold">{t('alphabet_game.incorrect_feedback')}: {currentQuiz.letter}</span>
                     </div>
                   )}
                 </div>
