@@ -34,6 +34,8 @@ const VowelConsonantScreen = ({ score, playSound, setGameState }) => {
   const { showMenu, setShowMenu } = useResponsiveMenu(true);
   const { isFullscreen } = useFullscreen() || {};
   const [isUpper, setIsUpper] = useState(true);
+  const [clickedLetters, setClickedLetters] = useState([]);
+  const [focusedLetter, setFocusedLetter] = useState(null);
 
   return (
     <div className="h-screen flex flex-col font-inter relative overflow-hidden" style={{background: 'linear-gradient(135deg, #e0f7fa 0%, #f3e8ff 100%)'}}>
@@ -70,20 +72,28 @@ const VowelConsonantScreen = ({ score, playSound, setGameState }) => {
                 <h3 className="text-2xl md:text-3xl font-extrabold text-center mb-2 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent uppercase tracking-wider drop-shadow-lg" style={{fontFamily:'Baloo 2, Arial, sans-serif'}}>{item.label}</h3>
                 <p className="text-gray-600 text-center text-sm mb-2">{item.desc}</p>
                 <div className="flex flex-wrap justify-center gap-2 mt-2">
-                  {item.letters.map((ch, idx) => (
-                    <button
-                      key={idx}
-                      onClick={e => {
-                        if (playSound) playSound(isUpper ? ch : ch.toLowerCase());
-                        e.currentTarget.classList.add('animate-bounce');
-                        setTimeout(() => e.currentTarget.classList.remove('animate-bounce'), 500);
-                      }}
-                      className="inline-block bg-blue-100 text-blue-700 font-bold rounded-lg px-3 py-1 text-lg shadow-sm mb-1 hover:bg-blue-200 active:bg-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                      style={{ transition: 'background 0.2s, transform 0.2s' }}
-                    >
-                      {isUpper ? ch : ch.toLowerCase()}
-                    </button>
-                  ))}
+                  {item.letters.map((ch, idx) => {
+                    const displayChar = isUpper ? ch : ch.toLowerCase();
+                    const isClicked = clickedLetters.includes(displayChar);
+                    const isFocused = focusedLetter === displayChar;
+                    return (
+                      <button
+                        key={idx}
+                        onClick={() => {
+                          setFocusedLetter(displayChar);
+                          setClickedLetters(prev => prev.includes(displayChar) ? prev : [...prev, displayChar]);
+                          if (playSound) playSound(displayChar);
+                        }}
+                        className={`inline-block font-bold rounded-lg px-3 py-1 text-lg shadow-sm mb-1 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition border-2
+                          ${isClicked ? 'bg-yellow-100 text-yellow-700 border-yellow-400' : 'bg-blue-100 text-blue-700 border-blue-300'}
+                          ${isFocused ? 'ring-4 ring-yellow-400 z-10' : ''}`}
+                        style={{ transition: 'background 0.2s, transform 0.2s' }}
+                        type="button"
+                      >
+                        {displayChar}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             ))}
