@@ -23,5 +23,8 @@ export const handleMenuClick = (menuKey, setShowMenu, setGameState) => {
   } else if (menuKey === 'writing' && typeof setGameState === 'function') {
     setShowMenu(false);
     setGameState('writing');
+  }  else if (menuKey === 'alphabet-intro' && typeof setGameState === 'function') {
+    setShowMenu(false);
+    setGameState('alphabet-intro');
   } 
 }; 

@@ -1,11 +1,12 @@
 import React, { useState, useRef } from 'react';
-import { CheckCircle, XCircle, ArrowLeft, ArrowRight, Volume2 } from 'lucide-react';
+import { CheckCircle, XCircle, ArrowLeft, ArrowRight, Volume2, Minimize } from 'lucide-react';
 import Header from './Header.jsx';
 import Menu from './Menu.jsx';
 import Footer from './Footer.jsx';
 import { handleMenuClick } from '../utils/menuUtils.js';
 import { useResponsiveMenu } from '../hooks/useResponsiveMenu.js';
 import PropTypes from 'prop-types';
+import { useFullscreen } from './Header.jsx';
 
 const vietnameseAlphabet = [
   { letter: 'A', smallLetter: 'a', pronunciation: 'a', example: 'áo', exampleMeaning: 'shirt' },
@@ -13,7 +14,7 @@ const vietnameseAlphabet = [
   { letter: 'Â', smallLetter: 'â', pronunciation: 'â', example: 'ấm', exampleMeaning: 'warm' },
   { letter: 'B', smallLetter: 'b', pronunciation: 'bê', example: 'bàn', exampleMeaning: 'table' },
   { letter: 'C', smallLetter: 'c', pronunciation: 'xê', example: 'cá', exampleMeaning: 'fish' },
-  { letter: 'D', smallLetter: 'd', pronunciation: 'dê', example: 'Con dê', exampleMeaning: 'Goat' },
+  { letter: 'D', smallLetter: 'd', pronunciation: 'dê', example: 'dừa', exampleMeaning: 'coconut' },
   { letter: 'Đ', smallLetter: 'đ', pronunciation: 'đê', example: 'đi', exampleMeaning: 'go' },
   { letter: 'E', smallLetter: 'e', pronunciation: 'e', example: 'em', exampleMeaning: 'younger sibling' },
   { letter: 'Ê', smallLetter: 'ê', pronunciation: 'ê', example: 'êm', exampleMeaning: 'smooth' },
@@ -24,7 +25,7 @@ const vietnameseAlphabet = [
   { letter: 'L', smallLetter: 'l', pronunciation: 'lờ', example: 'lá', exampleMeaning: 'leaf' },
   { letter: 'M', smallLetter: 'm', pronunciation: 'mờ', example: 'mẹ', exampleMeaning: 'mother' },
   { letter: 'N', smallLetter: 'n', pronunciation: 'nờ', example: 'nước', exampleMeaning: 'water' },
-  { letter: 'O', smallLetter: 'o', pronunciation: 'o', example: 'Con ong', exampleMeaning: 'Bee' },
+  { letter: 'O', smallLetter: 'o', pronunciation: 'o', example: 'ong', exampleMeaning: 'bee' },
   { letter: 'Ô', smallLetter: 'ô', pronunciation: 'ô', example: 'ốc', exampleMeaning: 'snail' },
   { letter: 'Ơ', smallLetter: 'ơ', pronunciation: 'ơ', example: 'ở', exampleMeaning: 'at' },
   { letter: 'P', smallLetter: 'p', pronunciation: 'pê', example: 'phở', exampleMeaning: 'pho' },
@@ -49,6 +50,7 @@ const AlphabetGame = ({ setGameState, score, setScore }) => {
   const [quizOptions, setQuizOptions] = useState([]);
   const [currentQuiz, setCurrentQuiz] = useState(null);
   const { showMenu, setShowMenu } = useResponsiveMenu();
+  const { isFullscreen: headerIsFullscreen, setIsFullscreen: setHeaderIsFullscreen } = useFullscreen() || {};
 
   const audioCtxRef = useRef(null);
   if (!audioCtxRef.current && typeof window !== 'undefined') {
@@ -160,11 +162,23 @@ const AlphabetGame = ({ setGameState, score, setScore }) => {
           showMenu={showMenu}
           onMenuToggle={() => setShowMenu(show => !show)}
         />
-        <Menu
-          showMenu={showMenu}
-          onMenuClick={onMenuClick}
-        />
-        <main className={`transition-all duration-300 flex flex-col items-center justify-start w-full sm:overflow-y-auto overflow-hidden ${showMenu ? 'pl-44' : ''}`} style={{willChange: 'transform', height: 'calc(100vh - 56px - 32px)', marginTop: '56px'}}>
+        {!headerIsFullscreen && (
+          <Menu
+            showMenu={showMenu}
+            onMenuClick={onMenuClick}
+          />
+        )}
+        <main className={`transition-all duration-300 flex flex-col items-center justify-start w-full sm:overflow-y-auto overflow-hidden ${showMenu && !headerIsFullscreen ? 'pl-44' : ''} ${headerIsFullscreen ? 'fixed inset-0 z-50 bg-white' : ''}`}
+          style={{willChange: 'transform', height: headerIsFullscreen ? '100vh' : 'calc(100vh - 56px - 32px)', marginTop: headerIsFullscreen ? 0 : '56px'}}>
+          {headerIsFullscreen && setHeaderIsFullscreen && (
+            <button
+              onClick={() => setHeaderIsFullscreen(false)}
+              className="absolute top-4 right-4 z-50 p-2 rounded-full bg-blue-100 hover:bg-blue-200 transition-colors"
+              title="Thoát toàn màn hình"
+            >
+              <Minimize className="w-6 h-6 text-blue-600" />
+            </button>
+          )}
           <div className="max-w-4xl mx-auto w-full p-6 sm:p-8">
             {/* Letter Display */}
             <div className="bg-white rounded-2xl shadow-xl p-12 mb-8 relative">
@@ -230,7 +244,7 @@ const AlphabetGame = ({ setGameState, score, setScore }) => {
             </div>
           </div>
         </main>
-        <Footer score={score} lives={3} />
+        <Footer score={score} />
       </div>
     );
   }
@@ -244,11 +258,23 @@ const AlphabetGame = ({ setGameState, score, setScore }) => {
           showMenu={showMenu}
           onMenuToggle={() => setShowMenu(show => !show)}
         />
-        <Menu
-          showMenu={showMenu}
-          onMenuClick={onMenuClick}
-        />
-        <main className={`transition-all duration-300 flex flex-col items-center justify-start w-full sm:overflow-y-auto overflow-hidden ${showMenu ? 'pl-44' : ''}`} style={{willChange: 'transform', height: 'calc(100vh - 56px - 32px)', marginTop: '56px'}}>
+        {!headerIsFullscreen && (
+          <Menu
+            showMenu={showMenu}
+            onMenuClick={onMenuClick}
+          />
+        )}
+        <main className={`transition-all duration-300 flex flex-col items-center justify-start w-full sm:overflow-y-auto overflow-hidden ${showMenu && !headerIsFullscreen ? 'pl-44' : ''} ${headerIsFullscreen ? 'fixed inset-0 z-50 bg-white' : ''}`}
+          style={{willChange: 'transform', height: headerIsFullscreen ? '100vh' : 'calc(100vh - 56px - 32px)', marginTop: headerIsFullscreen ? 0 : '56px'}}>
+          {headerIsFullscreen && setHeaderIsFullscreen && (
+            <button
+              onClick={() => setHeaderIsFullscreen(false)}
+              className="absolute top-4 right-4 z-50 p-2 rounded-full bg-blue-100 hover:bg-blue-200 transition-colors"
+              title="Thoát toàn màn hình"
+            >
+              <Minimize className="w-6 h-6 text-blue-600" />
+            </button>
+          )}
           <div className="max-w-4xl mx-auto w-full p-6 sm:p-8">
             {/* Stats and Back Button */}
             <div className="flex justify-between items-center mb-8">
@@ -320,7 +346,7 @@ const AlphabetGame = ({ setGameState, score, setScore }) => {
             </div>
           </div>
         </main>
-        <Footer score={score} lives={3} />
+        <Footer score={score} />
       </div>
     );
   }

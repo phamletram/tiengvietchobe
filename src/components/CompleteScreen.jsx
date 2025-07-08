@@ -6,6 +6,7 @@ import Menu from './Menu.jsx';
 import Footer from './Footer.jsx';
 import { handleMenuClick } from '../utils/menuUtils.js';
 import { useResponsiveMenu } from '../hooks/useResponsiveMenu.js';
+import { useFullscreen } from './Header.jsx';
 
 const CompleteScreen = ({
   currentLesson,
@@ -13,27 +14,39 @@ const CompleteScreen = ({
   lessons,
   setCurrentWord,
   setGameState,
-  resetGame
+  resetGame,
+  isFullscreen,
+  setIsFullscreen
 }) => {
   const { showMenu, setShowMenu } = useResponsiveMenu();
+  const { isFullscreen: headerIsFullscreen, setIsFullscreen: setHeaderIsFullscreen } = useFullscreen() || {};
   
   const onMenuClick = (menuKey) => handleMenuClick(menuKey, setShowMenu, setGameState);
 
   return (
     <div className="h-screen flex flex-col font-inter relative overflow-hidden" style={{background: 'linear-gradient(135deg, #e0f7fa 0%, #f3e8ff 100%)'}}>
-      <Header 
+      <Header
         title="Hoàn thành bài học"
         showMenu={showMenu}
         onMenuToggle={() => setShowMenu(show => !show)}
       />
-
-      <Menu 
-        showMenu={showMenu}
-        onMenuClick={onMenuClick}
-      />
-
-      {/* Main content */}
-      <main className={`transition-all duration-300 flex flex-col items-center justify-center w-full ${showMenu ? 'pl-44' : ''}`} style={{willChange: 'transform', height: 'calc(100vh - 56px - 32px)', marginTop: '56px', paddingTop: '20px', paddingBottom: '20px'}}>
+      {!headerIsFullscreen && (
+        <Menu 
+          showMenu={showMenu}
+          onMenuClick={onMenuClick}
+        />
+      )}
+      <main className={`transition-all duration-300 flex flex-col items-center justify-center w-full ${showMenu && !headerIsFullscreen ? 'pl-44' : ''} ${headerIsFullscreen ? 'fixed inset-0 z-50 bg-white' : ''}`}
+        style={{willChange: 'transform', height: headerIsFullscreen ? '100vh' : 'calc(100vh - 56px - 32px)', marginTop: headerIsFullscreen ? 0 : '56px', paddingTop: headerIsFullscreen ? 0 : '20px', paddingBottom: headerIsFullscreen ? 0 : '20px'}}>
+        {headerIsFullscreen && setIsFullscreen && (
+          <button
+            onClick={() => setIsFullscreen(false)}
+            className="absolute top-4 right-4 z-50 p-2 rounded-full bg-blue-100 hover:bg-blue-200 transition-colors"
+            title="Thoát toàn màn hình"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4h4M20 16v4h-4M4 16v4h4M20 8V4h-4" /></svg>
+          </button>
+        )}
         <div className="flex flex-col items-center justify-center p-4 sm:p-6 w-full max-w-4xl">
           <div className="bg-white rounded-3xl p-8 sm:p-5 shadow-2xl max-w-lg w-full text-center transform transition-transform duration-300 ease-in-out hover:scale-[1.01]">
             <div className="text-8xl mb-6 animate-spin-slow">🏆</div>
@@ -74,8 +87,6 @@ const CompleteScreen = ({
           </div>
         </div>
       </main>
-
-      <Footer score={score} />
     </div>
   );
 };

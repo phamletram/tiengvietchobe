@@ -8,6 +8,7 @@ import Footer from './Footer.jsx';
 import Confetti from 'react-confetti';
 import { handleMenuClick } from '../utils/menuUtils.js';
 import { useResponsiveMenu } from '../hooks/useResponsiveMenu.js';
+import { useFullscreen } from './Header.jsx';
 
 function MemoryCard({ card, isFlipped, isMatched, onClick, disabled }) {
   const getCardContent = () => {
@@ -44,7 +45,7 @@ function MemoryCard({ card, isFlipped, isMatched, onClick, disabled }) {
   );
 }
 
-const FlipGameScreen = ({ setGameState, score, setScore }) => {
+const FlipGameScreen = ({ setGameState, score, setScore, isFullscreen, setIsFullscreen }) => {
   const { showMenu, setShowMenu } = useResponsiveMenu();
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
   const [cards, setCards] = useState([]);
@@ -245,21 +246,23 @@ const FlipGameScreen = ({ setGameState, score, setScore }) => {
 
   const onMenuClick = (menuKey) => handleMenuClick(menuKey, setShowMenu, setGameState);
 
+  const { isFullscreen: headerIsFullscreen, setIsFullscreen: headerSetIsFullscreen } = useFullscreen() || {};
+
   return (
     <div className="h-screen flex flex-col font-inter relative overflow-hidden" style={{background: 'linear-gradient(135deg, #e0f7fa 0%, #f3e8ff 100%)'}}>
-      <Header 
-        title="Tìm cặp từ giống nhau"
+      <Header
+        title="Lật thẻ ghi nhớ"
         showMenu={showMenu}
         onMenuToggle={() => setShowMenu(show => !show)}
       />
-
-      <Menu 
-        showMenu={showMenu}
-        onMenuClick={onMenuClick}
-      />
-
-      {/* Main content */}
-      <main className={`transition-all duration-300 flex flex-col items-center justify-start w-full overflow-y-auto ${showMenu ? 'pl-44' : ''}`} style={{willChange: 'transform', height: 'calc(100vh - 56px - 32px)', marginTop: '56px'}}>
+      {!headerIsFullscreen && (
+        <Menu
+          showMenu={showMenu}
+          onMenuClick={onMenuClick}
+        />
+      )}
+      <main className={`transition-all duration-300 flex flex-col items-center justify-start w-full flex-1 min-h-0 ${showMenu && !isFullscreen ? 'pl-44' : ''} ${isFullscreen ? 'fixed inset-0 z-50 bg-white' : ''}`}
+        style={{willChange: 'transform', height: isFullscreen ? '100vh' : 'calc(100vh - 56px - 32px)', marginTop: isFullscreen ? 0 : '56px'}}>
         <div className="flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 w-full max-w-7xl pb-8">
           {/* Game Stats */}
           <div className="flex flex-nowrap justify-center gap-2 sm:gap-4 mb-4 sm:mb-6">
@@ -317,9 +320,7 @@ const FlipGameScreen = ({ setGameState, score, setScore }) => {
           </div>
         </div>
       </main>
-
       <Footer score={score} />
-
       {/* Toast điểm số khi hoàn thành + Confetti */}
       {showScorePopup && (
         <>

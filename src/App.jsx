@@ -10,8 +10,12 @@ import FlipGameScreen from './components/FlipGameScreen.jsx';
 import WordPuzzleGame from './components/WordPuzzleGame.tsx';
 import AlphabetGame from './components/AlphabetGame.jsx';
 import AlphabetWritingGame from './components/AlphabetWritingGame.jsx';
+import AlphabetIntroScreen from './components/AlphabetIntroScreen.jsx';
+import VowelConsonantScreen from './components/VowelConsonantScreen.jsx';
+import AlphabetSortGame from './components/AlphabetSortGame.jsx';
 //import WordGame from './components/WordGame.jsx';
 import { lessons } from './data/lessons.js';
+import { FullscreenContext } from './components/Header.jsx';
 
 const VietnameseLearningApp = () => {
   const [currentLesson, setCurrentLesson] = useState(0);
@@ -26,6 +30,8 @@ const VietnameseLearningApp = () => {
   const [gameState, setGameState] = useState('topic');
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [showResult, setShowResult] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [history, setHistory] = useState([]);
 
   // Effect để lưu score vào localStorage mỗi khi score thay đổi
   useEffect(() => {
@@ -82,10 +88,19 @@ const VietnameseLearningApp = () => {
     setShowResult(false);
   };
 
-   // Function để reset hoàn toàn điểm số (nếu cần)
-  const resetScore = () => {
-    setScore(0);
-    localStorage.removeItem('vietnamese_learning_score');
+  const handleSetGameState = (nextState) => {
+    setHistory(prev => [...prev, gameState]);
+    setGameState(nextState);
+  };
+
+  const handleBack = () => {
+    setHistory(prev => {
+      if (prev.length === 0) return prev;
+      const newHistory = [...prev];
+      const last = newHistory.pop();
+      setGameState(last || 'main');
+      return newHistory;
+    });
   };
 
   // Game Over Screen
@@ -104,38 +119,53 @@ const VietnameseLearningApp = () => {
     setCurrentWord,
     setScore,
     setLives,
-    setGameState,
+    setGameState: handleSetGameState,
+    onBack: handleBack,
     playSound,
     generateQuizOptions,
     handleQuizAnswer,
     resetGame,
     selectedAnswer,
-    showResult
+    showResult,
+    isFullscreen,
+    setIsFullscreen
   };
 
   // Main render logic
-  switch (gameState) {
-    case 'main':
-      return <MainScreen {...screenProps} />;
-    case 'topic':
-      return <TopicWordScreen {...screenProps} />;
-    case 'lesson':
-      return <LessonScreen {...screenProps} />;
-    case 'quiz':
-      return <QuizScreen {...screenProps} />;
-    case 'complete':
-      return <CompleteScreen {...screenProps} />;
-    case 'flipgame':
-      return <FlipGameScreen {...screenProps} />;
-    case 'puzzlegame':
-        return <WordPuzzleGame {...screenProps} />;
-    case 'alphabet':
-        return <AlphabetGame {...screenProps} />;
-    case 'writing':
-      return <AlphabetWritingGame {...screenProps} />;
-    default:
-      return <MainScreen {...screenProps} />;
-  }
+  return (
+    <FullscreenContext.Provider value={{ isFullscreen, setIsFullscreen }}>
+      {(() => {
+        switch (gameState) {
+          case 'main':
+            return <MainScreen {...screenProps} />;
+          case 'topic':
+            return <TopicWordScreen {...screenProps} />;
+          case 'lesson':
+            return <LessonScreen {...screenProps} />;
+          case 'quiz':
+            return <QuizScreen {...screenProps} />;
+          case 'complete':
+            return <CompleteScreen {...screenProps} />;
+          case 'flipgame':
+            return <FlipGameScreen {...screenProps} />;
+          case 'puzzlegame':
+            return <WordPuzzleGame {...screenProps} />;
+          case 'alphabet':
+            return <AlphabetGame {...screenProps} />;
+          case 'writing':
+            return <AlphabetWritingGame {...screenProps} />;
+          case 'alphabet-intro':
+            return <AlphabetIntroScreen {...screenProps} />;
+          case 'vowel-consonant':
+            return <VowelConsonantScreen {...screenProps} />;
+          case 'sort-vowel-consonant':
+            return <AlphabetSortGame {...screenProps} />;
+          default:
+            return <MainScreen {...screenProps} />;
+        }
+      })()}
+    </FullscreenContext.Provider>
+  );
 };
 
 export default VietnameseLearningApp;

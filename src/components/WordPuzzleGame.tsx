@@ -6,6 +6,7 @@ import Menu from './Menu.jsx';
 import Footer from './Footer.jsx';
 import { handleMenuClick } from '../utils/menuUtils.js';
 import { useResponsiveMenu } from '../hooks/useResponsiveMenu.js';
+import { useFullscreen } from './Header.jsx';
 
 interface Word {
   vietnamese: string;
@@ -42,10 +43,11 @@ interface WordPuzzleGameProps {
   setScore: (score: number) => void;
 }
 
-const WordPuzzleGame: React.FC<WordPuzzleGameProps> = ({ setGameState, score, setScore }) => {
+const WordPuzzleGame: React.FC<WordPuzzleGameProps & { isFullscreen?: boolean, setIsFullscreen?: (v: boolean) => void }> = ({ setGameState, score, setScore, isFullscreen, setIsFullscreen }) => {
   // Chế độ chơi: 'puzzle' (ghép chữ) hoặc 'card' (lật thẻ)
   const [mode] = useState<'puzzle'>('puzzle');
   const { showMenu, setShowMenu } = useResponsiveMenu();
+  const { isFullscreen: headerIsFullscreen, setIsFullscreen: setHeaderIsFullscreen } = useFullscreen() || {};
 
   // State chọn bài học
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
@@ -384,17 +386,31 @@ const WordPuzzleGame: React.FC<WordPuzzleGameProps> = ({ setGameState, score, se
     
     return (
       <div className="h-screen flex flex-col font-inter relative overflow-hidden" style={{background: 'linear-gradient(135deg, #e0f7fa 0%, #f3e8ff 100%)'}}>
-        <Header 
-          title="Game xếp chữ"
-          showMenu={showMenu}
-          onMenuToggle={() => setShowMenu(show => !show)}
-        />
-        <Menu 
-          showMenu={showMenu}
-          onMenuClick={onMenuClick}
-        />
-        {/* Main content */}
-        <main className={`transition-all duration-300 flex flex-col items-center justify-start w-full overflow-y-auto ${showMenu ? 'pl-44' : ''}`} style={{willChange: 'transform', height: 'calc(100vh - 56px - 32px)', marginTop: '56px'}}>
+        {!headerIsFullscreen && (
+          <Header
+            title="🧩 Ghép chữ tiếng Việt"
+            showMenu={showMenu}
+            onMenuToggle={() => setShowMenu(show => !show)}
+          />
+        )}
+        {!headerIsFullscreen && (
+          <Menu
+            showMenu={showMenu}
+            onMenuClick={onMenuClick}
+            onMenuToggle={() => setShowMenu(show => !show)}
+          />
+        )}
+        <main className={`transition-all duration-300 flex flex-col items-center justify-start w-full ${isFullscreen ? 'fixed inset-0 z-50 bg-white' : ''} ${showMenu && !isFullscreen ? 'pl-44' : ''}`}
+          style={{willChange: 'transform', height: isFullscreen ? '100vh' : 'calc(100vh - 56px - 32px)', marginTop: isFullscreen ? 0 : '56px'}}>
+          {isFullscreen && setIsFullscreen && (
+            <button
+              onClick={() => setIsFullscreen(false)}
+              className="absolute top-4 right-4 z-50 p-2 rounded-full bg-blue-100 hover:bg-blue-200 transition-colors"
+              title="Thoát toàn màn hình"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4h4M20 16v4h-4M4 16v4h4M20 8V4h-4" /></svg>
+            </button>
+          )}
           <div className="grid grid-cols-3 gap-6 max-w-6xl w-full p-6 sm:p-8">
             {lessons.map((lesson, idx) => (
               <button
@@ -411,7 +427,7 @@ const WordPuzzleGame: React.FC<WordPuzzleGameProps> = ({ setGameState, score, se
             ))}
           </div>
         </main>
-        <Footer score={score} lives={3} />
+        <Footer score={score} />
       </div>
     );
   }
@@ -426,18 +442,23 @@ const WordPuzzleGame: React.FC<WordPuzzleGameProps> = ({ setGameState, score, se
     
     return (
       <div className="h-screen flex flex-col font-inter relative overflow-hidden" style={{background: 'linear-gradient(135deg, #e0f7fa 0%, #f3e8ff 100%)'}}>
-        <Header 
+        <Header
           title={`🧩 Xếp chữ - ${sampleLesson.title}`}
           showMenu={showMenu}
           onMenuToggle={() => setShowMenu(show => !show)}
         />
-        <Menu 
-          showMenu={showMenu}
-          onMenuClick={onMenuClick}
-        />
+        {!headerIsFullscreen && (
+          <Menu
+            showMenu={showMenu}
+            onMenuClick={onMenuClick}
+            onMenuToggle={() => setShowMenu(show => !show)}
+          />
+        )}
 
         {/* Main content */}
-        <main className={`transition-all duration-300 flex flex-col items-center justify-start w-full overflow-y-auto ${showMenu ? 'pl-44' : ''}`} style={{willChange: 'transform', height: 'calc(100vh - 56px - 32px)', marginTop: '56px'}}>
+        <main className={`transition-all duration-300 flex flex-col items-center justify-start w-full flex-1 min-h-0 ${showMenu && !headerIsFullscreen ? 'pl-44' : ''} ${headerIsFullscreen ? 'fixed inset-0 z-50 bg-white' : ''}`}
+          style={{willChange: 'transform', height: headerIsFullscreen ? '100vh' : 'calc(100vh - 56px - 32px)', marginTop: headerIsFullscreen ? 0 : '56px'}}>
+          {/* Đã loại bỏ nút Minimize riêng lẻ, Header sẽ quản lý */}
           <div className="flex flex-col items-center justify-center p-6 sm:p-8 w-full max-w-4xl">
             {/* Game Stats */}
             {gameStarted && (
@@ -570,7 +591,7 @@ const WordPuzzleGame: React.FC<WordPuzzleGameProps> = ({ setGameState, score, se
             )}
           </div>
         </main>
-        <Footer score={score} lives={3} />
+        <Footer score={score} />
       </div>
     );
   }

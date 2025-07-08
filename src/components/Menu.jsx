@@ -6,11 +6,18 @@ const Menu = ({
   onMenuClick 
 }) => {
   const stations = [
+    
     {
       key: 'home',
       label: 'Trang chủ',
       icon: '🏠',
       color: 'from-green-200 to-blue-200',
+    },
+    {
+      key: 'alphabet-intro',
+      label: 'Chữ cái',
+      icon: '🔤',
+      color: 'from-yellow-200 to-pink-200',
     },
     {
       key: 'topic',
@@ -30,18 +37,7 @@ const Menu = ({
       icon: '🧩',
       color: 'from-yellow-200 to-blue-200',
     },
-    {
-      key: 'alphabet',
-      label: 'Chữ cái',
-      icon: '🔤',
-      color: 'from-blue-200 to-pink-200',
-    },
-    {
-      key: 'writing',
-      label: 'Tập viết',
-      icon: '✍️',
-      color: 'from-pink-200 to-blue-200',
-    },
+  
   ];
 
   return (

@@ -6,10 +6,12 @@ import Footer from './Footer.jsx';
 import PropTypes from 'prop-types';
 import { handleMenuClick } from '../utils/menuUtils.js';
 import { useResponsiveMenu } from '../hooks/useResponsiveMenu.js';
+import { useFullscreen } from './Header.jsx';
 
 const MainScreen = ({ score, setGameState }) => {
   const containerRef = useRef(null);
   const { showMenu, setShowMenu } = useResponsiveMenu();
+  const { isFullscreen, setIsFullscreen } = useFullscreen() || {};
 
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
 
@@ -30,17 +32,30 @@ const MainScreen = ({ score, setGameState }) => {
   return (
     <div className={`min-h-screen flex flex-col font-inter relative overflow-x-hidden ${!isMobile ? 'overflow-y-hidden' : ''}`}
       style={{height: '100vh', maxHeight: '100vh', background: 'linear-gradient(135deg, #e0f7fa 0%, #f3e8ff 100%)'}}>
-      <Header 
-        title="Học Tiếng Việt"
-        showMenu={showMenu}
-        onMenuToggle={() => setShowMenu(show => !show)}
-      />
-      <Menu 
-        showMenu={showMenu}
-        onMenuClick={onMenuClick}
-      />
-      {/* Nội dung chính bị đẩy sang phải khi mở menu */}
-      <main className={`transition-all duration-300 flex-1 flex flex-col items-center justify-center min-h-0 w-full ${showMenu ? 'pl-56 scale-90 translate-x-10' : ''}`} style={{willChange: 'transform'}}>
+      {!isFullscreen && (
+        <Header 
+          title="Học Tiếng Việt"
+          showMenu={showMenu}
+          onMenuToggle={() => setShowMenu(show => !show)}
+        />
+      )}
+      {!isFullscreen && (
+        <Menu 
+          showMenu={showMenu}
+          onMenuClick={onMenuClick}
+        />
+      )}
+      <main className={`transition-all duration-300 flex-1 flex flex-col items-center justify-center min-h-0 w-full ${showMenu && !isFullscreen ? 'pl-56 scale-90 translate-x-10' : ''} ${isFullscreen ? 'fixed inset-0 z-50 bg-white' : ''}`}
+        style={{willChange: 'transform', height: isFullscreen ? '100vh' : undefined, marginTop: isFullscreen ? 0 : undefined}}>
+        {isFullscreen && setIsFullscreen && (
+          <button
+            onClick={() => setIsFullscreen(false)}
+            className="absolute top-4 right-4 z-50 p-2 rounded-full bg-blue-100 hover:bg-blue-200 transition-colors"
+            title="Thoát toàn màn hình"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4h4M20 16v4h-4M4 16v4h4M20 8V4h-4" /></svg>
+          </button>
+        )}
         <div ref={containerRef} className="w-full max-w-4xl mx-auto flex flex-col items-center justify-center flex-1 min-h-0">
           <div className="flex flex-col items-center justify-center w-full h-full">
             <div className="bg-white bg-opacity-80 rounded-xl shadow-lg px-8 py-6 mt-10">
@@ -50,7 +65,8 @@ const MainScreen = ({ score, setGameState }) => {
           </div>
         </div>
       </main>
-      <Footer score={score} />
+      {/* Footer đã tự động ẩn khi fullscreen nhờ context */}
+      <Footer score={score} isFullscreen={isFullscreen} />
       <style>{`
         @keyframes bounce-slow {
           0%, 100% { transform: translateY(0); }

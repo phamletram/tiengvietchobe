@@ -7,6 +7,7 @@ import Footer from './Footer.jsx';
 import { handleMenuClick } from '../utils/menuUtils.js';
 import { useResponsiveMenu } from '../hooks/useResponsiveMenu.js';
 import PropTypes from 'prop-types';
+import { useFullscreen } from './Header.jsx';
 
 const vietnameseAlphabet = [
   'A', 'Ă', 'Â', 'B', 'C', 'D', 'Đ', 'E', 'Ê', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'O', 'Ô', 'Ơ', 'P', 'Q', 'R', 'S', 'T', 'U', 'Ư', 'V', 'X', 'Y'
@@ -21,6 +22,7 @@ const AlphabetWritingGame = ({ setGameState }) => {
   const canvasRef = useRef();
   const sampleCanvasRef = useRef(); // canvas ẩn để render chữ mẫu
   const { showMenu, setShowMenu } = useResponsiveMenu();
+  const { isFullscreen } = useFullscreen() || {};
 
   const currentLetter = isUpper ? vietnameseAlphabet[currentIndex] : vietnameseAlphabetLower[currentIndex];
 
@@ -65,28 +67,33 @@ const AlphabetWritingGame = ({ setGameState }) => {
 
   return (
     <div className="h-screen flex flex-col font-inter relative overflow-hidden" style={{background: 'linear-gradient(135deg, #e0f7fa 0%, #f3e8ff 100%)'}}>
-      <Header
-        title={<div className="flex items-center gap-2"><span>✍️ Tập viết chữ cái</span>
-          <button
-            onClick={() => setIsUpper(u => !u)}
-            className={
-              `ml-2 flex items-center px-2 py-1 rounded-full border-2 border-blue-500 bg-white shadow-sm transition-all duration-200 focus:outline-none hover:bg-blue-50 active:scale-95`
-            }
-            style={{ minWidth: 56 }}
-            title={isUpper ? 'Chuyển sang viết chữ thường' : 'Chuyển sang viết chữ hoa'}
-          >
-            <span className={`transition-all duration-200 mx-1 ${isUpper ? 'text-blue-600 text-xl font-extrabold' : 'text-blue-400 text-base font-semibold opacity-70'}`}>A</span>
-            <span className="mx-0.5 text-blue-300 font-bold select-none">|</span>
-            <span className={`transition-all duration-200 mx-1 ${!isUpper ? 'text-blue-600 text-xl font-extrabold' : 'text-blue-400 text-base font-semibold opacity-70'}`}>a</span>
-          </button></div>}
-        showMenu={showMenu}
-        onMenuToggle={() => setShowMenu(show => !show)}
-      />
-      <Menu
-        showMenu={showMenu}
-        onMenuClick={onMenuClick}
-      />
-      <main className={`transition-all duration-300 flex flex-col items-center justify-start w-full flex-1 min-h-0 ${showMenu ? 'pl-44' : ''}`} style={{willChange: 'transform', height: 'calc(100vh - 56px - 32px)', marginTop: '56px'}}>
+      {!isFullscreen && (
+        <Header
+          title={<div className="flex items-center gap-2"><span>✍️ Tập viết chữ cái</span>
+            <button
+              onClick={() => setIsUpper(u => !u)}
+              className={
+                `ml-2 flex items-center px-2 py-1 rounded-full border-2 border-blue-500 bg-white shadow-sm transition-all duration-200 focus:outline-none hover:bg-blue-50 active:scale-95`
+              }
+              style={{ minWidth: 56 }}
+              title={isUpper ? 'Chuyển sang viết chữ thường' : 'Chuyển sang viết chữ hoa'}
+            >
+              <span className={`transition-all duration-200 mx-1 ${isUpper ? 'text-blue-600 text-xl font-extrabold' : 'text-blue-400 text-base font-semibold opacity-70'}`}>A</span>
+              <span className="mx-0.5 text-blue-300 font-bold select-none">|</span>
+              <span className={`transition-all duration-200 mx-1 ${!isUpper ? 'text-blue-600 text-xl font-extrabold' : 'text-blue-400 text-base font-semibold opacity-70'}`}>a</span>
+            </button></div>}
+          showMenu={showMenu}
+          onMenuToggle={() => setShowMenu(show => !show)}
+        />
+      )}
+      {!isFullscreen && (
+        <Menu
+          showMenu={showMenu}
+          onMenuClick={onMenuClick}
+        />
+      )}
+      <main className={`transition-all duration-300 flex flex-col items-center justify-start w-full flex-1 min-h-0 ${showMenu && !isFullscreen ? 'pl-44' : ''} ${isFullscreen ? 'fixed inset-0 z-50 bg-white' : ''}`}
+        style={{willChange: 'transform', height: isFullscreen ? '100vh' : 'calc(100vh - 56px - 32px)', marginTop: isFullscreen ? 0 : '56px'}}>
         <div className="max-w-4xl mx-auto w-full p-4 sm:p-6">
           <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 mb-6">
             <div
@@ -149,8 +156,8 @@ const AlphabetWritingGame = ({ setGameState }) => {
             </button>
           </div>
         </div>
+        <Footer score={0} />
       </main>
-      <Footer score={0} lives={3} />
       {/* Canvas ẩn để render chữ mẫu */}
       <canvas ref={sampleCanvasRef} width={CANVAS_SIZE} height={CANVAS_SIZE} style={{ display: 'none' }} />
     </div>
@@ -159,6 +166,8 @@ const AlphabetWritingGame = ({ setGameState }) => {
 
 AlphabetWritingGame.propTypes = {
   setGameState: PropTypes.func,
+  isFullscreen: PropTypes.bool,
+  setIsFullscreen: PropTypes.func,
 };
 
 export default AlphabetWritingGame; 
