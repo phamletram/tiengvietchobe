@@ -25,7 +25,7 @@ function shuffle(array) {
   return arr;
 }
 
-const AlphabetSortGame = ({ score, setGameState }) => {
+const AlphabetSortGame = ({ score, setScore, setGameState }) => {
   const { showMenu, setShowMenu } = useResponsiveMenu(true);
   const { isFullscreen } = useFullscreen() || {};
   const [letters, setLetters] = useState(
@@ -68,8 +68,10 @@ const AlphabetSortGame = ({ score, setGameState }) => {
       l.letter === letterObj.letter ? { ...l, box, status: correct ? 'correct' : 'wrong' } : l
     ));
     setFeedback(correct ? 'Đúng rồi!' : 'Sai rồi!');
-    if (correct) playDingSound();
-    else playBuzzSound();
+    if (correct) {
+      playDingSound();
+      if (setScore) setScore(score + 5);
+    } else playBuzzSound();
     setTimeout(() => setFeedback(''), 1200);
     setActiveId(null);
   };
@@ -132,8 +134,8 @@ const AlphabetSortGame = ({ score, setGameState }) => {
           onMenuClick={setGameState}
         />
       )}
-      <main className={`transition-all duration-300 flex flex-col items-center justify-start w-full ${showMenu && !isFullscreen ? 'pl-44' : ''} ${isFullscreen ? 'fixed inset-0 z-50 bg-white' : ''}`}
-        style={{willChange: 'transform', height: isFullscreen ? '100vh' : 'calc(100vh - 56px - 32px)', marginTop: isFullscreen ? 0 : '56px'}}>
+      <main className={`transition-all duration-300 flex flex-col items-center justify-start w-full ${showMenu && !isFullscreen ? 'pl-44' : ''} ${isFullscreen ? 'fixed inset-0 z-50 bg-white' : ''} overflow-y-auto md:overflow-y-visible`}
+        style={{willChange: 'transform', height: isFullscreen ? '100vh' : 'calc(100vh - 56px - 32px)', marginTop: isFullscreen ? 0 : '56px', touchAction: 'none'}}>
         {showCongrats && (
           <Confetti width={window.innerWidth} height={window.innerHeight} numberOfPieces={400} recycle={false} />
         )}
@@ -191,7 +193,7 @@ function DropBox({ id, label, letters, onBack }) {
   return (
     <div
       ref={setNodeRef}
-      className={`flex-1 min-w-[180px] min-h-[120px] bg-white rounded-2xl shadow-lg p-4 border-2 border-blue-200 flex flex-col items-center justify-start relative transition-all duration-200 ${isOver ? 'ring-4 ring-blue-400' : ''}`}
+      className={`flex-1 min-w-[370px] min-h-[210px] md:min-w-[180px] md:min-h-[120px] bg-white rounded-2xl shadow-lg p-4 border-2 border-blue-200 flex flex-col items-center justify-start relative transition-all duration-200 ml-2 mr-2 ${isOver ? 'ring-4 ring-blue-400' : ''}`}
     >
       <div className="text-lg font-bold text-blue-700 mb-2">{label}</div>
       <div className="flex flex-wrap gap-2 justify-center min-h-[40px]">

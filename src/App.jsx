@@ -27,7 +27,7 @@ const VietnameseLearningApp = () => {
     return savedScore ? parseInt(savedScore, 10) : 0;
   });
   const [lives, setLives] = useState(3);
-  const [gameState, setGameState] = useState('topic');
+  const [gameState, setGameState] = useState('alphabet-intro');
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [showResult, setShowResult] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
