@@ -1,8 +1,21 @@
 // components/WordCard.js
 import React from 'react';
 import { Volume2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
-const WordCard = ({ word, onPlaySound }) => {
+const WordCard = ({ word, language, onPlaySound }) => {
+  const { t, i18n } = useTranslation();
+  const lang = language || i18n.language;
+  let mainWord = word.vietnamese;
+  let subWord = word.english;
+  if (lang === 'en') {
+    mainWord = word.vietnamese;
+    subWord = word.english;
+  }
+  if (lang === 'ja') {
+    mainWord = word.vietnamese;
+    subWord = word.japanese;
+  }
   return (
     <div className="bg-white rounded-3xl p-8 sm:p-10 shadow-2xl max-w-lg w-full text-center transform transition-transform duration-300 ease-in-out hover:scale-[1.01]">
       <div className="text-8xl mb-6">
@@ -10,7 +23,7 @@ const WordCard = ({ word, onPlaySound }) => {
           <div className="flex justify-center">
             <img 
               src={word.image} 
-              alt={word.name || 'Image'} 
+              alt={mainWord || 'Image'} 
               className="w-32 h-32 object-cover"
             />
           </div>
@@ -20,10 +33,8 @@ const WordCard = ({ word, onPlaySound }) => {
           </div>
         )}
       </div>
-      
-      <h3 className="text-4xl md:text-5xl font-bold text-gray-800 mb-2">{word.vietnamese}</h3>
-      <p className="text-xl md:text-2xl text-gray-500 mb-6">{word.english}</p>
-      
+      <h3 className="text-4xl md:text-5xl font-bold text-gray-800 mb-2">{mainWord}</h3>
+      <p className="text-xl md:text-2xl text-gray-500 mb-6">{subWord}</p>
       <button
         onClick={onPlaySound}
         className="bg-green-500 hover:bg-green-600 text-white rounded-full p-4 md:p-5 mb-8 transition-all transform hover:scale-110 shadow-lg focus:outline-none focus:ring-4 focus:ring-green-300 active:scale-95"

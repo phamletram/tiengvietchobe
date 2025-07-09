@@ -8,6 +8,8 @@ import Footer from './Footer.jsx';
 import { handleMenuClick } from '../utils/menuUtils.js';
 import { useResponsiveMenu } from '../hooks/useResponsiveMenu.js';
 import { useFullscreen } from './Header.jsx';
+import { useTranslation } from 'react-i18next';
+import PropTypes from 'prop-types';
 
 const LessonScreen = ({
   currentLesson,
@@ -21,16 +23,22 @@ const LessonScreen = ({
   isFullscreen,
   setIsFullscreen
 }) => {
+  const { t, i18n } = useTranslation();
   const { showMenu, setShowMenu } = useResponsiveMenu();
   const { isFullscreen: headerIsFullscreen, setIsFullscreen: setHeaderIsFullscreen } = useFullscreen() || {};
   const word = lessons[currentLesson].words[currentWord];
+  const totalWords = lessons[currentLesson].words.length;
+  // Lấy title theo ngôn ngữ
+  let lessonTitle = lessons[currentLesson].title;
+  if (i18n.language === 'en') lessonTitle = lessons[currentLesson].title_en;
+  if (i18n.language === 'ja') lessonTitle = lessons[currentLesson].title_ja;
   
   const onMenuClick = (menuKey) => handleMenuClick(menuKey, setShowMenu, setGameState);
   
   return (
     <div className="h-screen flex flex-col font-inter relative overflow-hidden" style={{background: 'linear-gradient(135deg, #e0f7fa 0%, #f3e8ff 100%)'}}>
       <Header
-        title={lessons[currentLesson].title}
+        title={lessonTitle}
         showMenu={showMenu}
         onMenuToggle={() => setShowMenu(show => !show)}
       />
@@ -52,53 +60,72 @@ const LessonScreen = ({
           </button>
         )}
         <div className="flex flex-col items-center justify-center p-6 sm:p-8 w-full max-w-4xl">
-          <WordCard
-            word={word}
-            onPlaySound={() => playSound(word.vietnamese)}
-          />
-          
-          {/* Navigation Controls */}
-          <div className="flex justify-between items-center mt-6 w-full max-w-lg">
-            <button
-              onClick={() => setCurrentWord(Math.max(0, currentWord - 1))}
-              disabled={currentWord === 0}
-              className="flex items-center bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed rounded-full px-5 py-3 transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-300 active:scale-95 text-gray-700 font-semibold"
-            >
-              <ArrowLeft className="w-5 h-5 mr-2" />
-              Trước
-            </button>
-            
-            <span className="text-gray-700 text-lg font-medium bg-white bg-opacity-80 rounded-full px-4 py-2 shadow-md">
-              {currentWord + 1} / {lessons[currentLesson].words.length}
-            </span>
-            
-            {currentWord < lessons[currentLesson].words.length - 1 ? (
-              <button
-                onClick={() => setCurrentWord(currentWord + 1)}
-                className="flex items-center bg-blue-500 hover:bg-blue-600 text-white rounded-full px-5 py-3 transition-all transform hover:scale-105 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-300 active:scale-95 font-semibold"
-              >
-                Tiếp
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </button>
-            ) : (
-              <button
-                onClick={() => {
-                  setCurrentWord(0);
-                  setGameState('quiz');
-                  setLives(3);
-                }}
-                className="flex items-center bg-orange-500 hover:bg-orange-600 text-white rounded-full px-5 py-3 transition-all transform hover:scale-105 shadow-md focus:outline-none focus:ring-2 focus:ring-orange-300 active:scale-95 font-semibold"
-              >
-                Kiểm tra
-                <Star className="w-5 h-5 ml-2" />
-              </button>
-            )}
-          </div>
+          {currentWord >= totalWords ? (
+            <div className="flex flex-col items-center justify-center w-full py-12">
+              <div className="text-green-600 text-xl sm:text-2xl md:text-3xl font-bold mb-4 whitespace-nowrap">{t('lesson.completed', 'Bạn đã hoàn thành bài học!')}</div>
+            </div>
+          ) : (
+            <>
+              <WordCard
+                word={word}
+                language={i18n.language}
+                onPlaySound={() => playSound(word.vietnamese)}
+              />
+              {/* Navigation Controls */}
+              <div className="flex justify-between items-center mt-6 w-full max-w-lg">
+                <button
+                  onClick={() => setCurrentWord(Math.max(0, currentWord - 1))}
+                  disabled={currentWord === 0}
+                  className="flex items-center bg-gray-200 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed rounded-full px-5 py-3 transition-all transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-300 active:scale-95 text-gray-700 font-bold text-xs sm:text-sm md:text-base whitespace-nowrap max-w-full"
+                >
+                  <ArrowLeft className="w-5 h-5 mr-2" />
+                  {t('lesson.prev')}
+                </button>
+                <span className="text-gray-700 text-xs sm:text-sm md:text-base font-bold bg-white bg-opacity-80 rounded-full px-4 py-2 shadow-md whitespace-nowrap max-w-full">
+                  {t('lesson.progress', { current: currentWord + 1, total: totalWords })}
+                </span>
+                {currentWord < totalWords - 1 ? (
+                  <button
+                    onClick={() => setCurrentWord(currentWord + 1)}
+                    className="flex items-center bg-blue-500 hover:bg-blue-600 text-white rounded-full px-5 py-3 transition-all transform hover:scale-105 shadow-md focus:outline-none focus:ring-2 focus:ring-blue-300 active:scale-95 font-bold text-xs sm:text-sm md:text-base whitespace-nowrap max-w-full"
+                  >
+                    {t('lesson.next')}
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setCurrentWord(0);
+                      setGameState('quiz');
+                      setLives(3);
+                    }}
+                    className="flex items-center bg-orange-500 hover:bg-orange-600 text-white rounded-full px-5 py-3 transition-all transform hover:scale-105 shadow-md focus:outline-none focus:ring-2 focus:ring-orange-300 active:scale-95 font-bold text-xs sm:text-sm md:text-base whitespace-nowrap max-w-full"
+                  >
+                    {t('lesson.quiz')}
+                    <Star className="w-5 h-5 ml-2" />
+                  </button>
+                )}
+              </div>
+            </>
+          )}
         </div>
       </main>
-      {/* Footer đã tự động ẩn khi fullscreen nhờ context */}
+      <Footer score={score} />
     </div>
   );
+};
+
+LessonScreen.propTypes = {
+  currentLesson: PropTypes.number.isRequired,
+  currentWord: PropTypes.number.isRequired,
+  score: PropTypes.number.isRequired,
+  lessons: PropTypes.array.isRequired,
+  setCurrentWord: PropTypes.func.isRequired,
+  setGameState: PropTypes.func.isRequired,
+  setLives: PropTypes.func.isRequired,
+  playSound: PropTypes.func.isRequired,
+  isFullscreen: PropTypes.bool,
+  setIsFullscreen: PropTypes.func,
 };
 
 export default LessonScreen;

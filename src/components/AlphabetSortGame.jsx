@@ -171,14 +171,14 @@ const AlphabetSortGame = ({ score, setScore, setGameState }) => {
           </DndContext>
           {/* Feedback */}
           {(feedback || showCongrats) && (
-            <div className={`mt-6 text-2xl font-bold text-center ${feedback === t('sort_game.correct') || showCongrats ? 'text-green-600' : 'text-red-500'}`}>
+            <div className={`mt-6 font-bold text-center text-lg sm:text-2xl ${feedback === t('sort_game.correct') || showCongrats ? 'text-green-600' : 'text-red-500'}`}>
               {showCongrats ? t('sort_game.all_correct') : feedback === 'Đúng rồi!' ? t('sort_game.correct') : feedback === 'Sai rồi!' ? t('sort_game.wrong') : feedback}
             </div>
           )}
           <div className="flex justify-center mt-8">
             <button
               onClick={handleReset}
-              className="bg-gradient-to-r from-blue-400 to-purple-500 text-white px-6 py-2 rounded-xl font-semibold hover:from-blue-500 hover:to-purple-600 transform hover:scale-105 transition-all duration-200 shadow-lg"
+              className="bg-gradient-to-r from-blue-400 to-purple-500 text-white px-3 py-1.5 text-sm sm:px-6 sm:py-2 sm:text-base rounded-xl font-semibold hover:from-blue-500 hover:to-purple-600 transform hover:scale-105 transition-all duration-200 shadow-lg"
             >
               {t('sort_game.reset')}
             </button>
@@ -195,10 +195,10 @@ function DropBox({ id, label, letters, onBack }) {
   return (
     <div
       ref={setNodeRef}
-      className={`flex-1 min-w-[370px] min-h-[210px] md:min-w-[180px] md:min-h-[120px] bg-white rounded-2xl shadow-lg p-4 border-2 border-blue-200 flex flex-col items-center justify-start relative transition-all duration-200 ml-2 mr-2 ${isOver ? 'ring-4 ring-blue-400' : ''}`}
+      className={`flex-1 min-w-[370px] min-h-[210px] md:min-w-[180px] md:min-h-[120px] bg-white rounded-2xl shadow-lg p-4 pt-2 border-2 border-blue-200 flex flex-col items-center justify-start relative transition-all duration-200 ml-2 mr-2 ${isOver ? 'ring-4 ring-blue-400' : ''}`}
     >
-      <div className="text-lg font-bold text-blue-700 mb-2">{label}</div>
-      <div className="flex flex-wrap gap-2 justify-center min-h-[40px]">
+      <div className="text-lg font-bold text-blue-700 mt-[-4px]">{label}</div>
+      <div className="flex flex-wrap gap-2 justify-center min-h-[40px]  mt-[10px]">
         {letters.map((l) => (
           <button
             key={l.letter}

@@ -7,6 +7,7 @@ import Footer from './Footer.jsx';
 import { handleMenuClick } from '../utils/menuUtils.js';
 import { useResponsiveMenu } from '../hooks/useResponsiveMenu.js';
 import { useFullscreen } from './Header.jsx';
+import { useTranslation } from 'react-i18next';
 
 const QuizScreen = ({
   currentLesson,
@@ -20,19 +21,25 @@ const QuizScreen = ({
   selectedAnswer,
   showResult,
   isFullscreen,
-  setIsFullscreen
+  setIsFullscreen,
+  resetGame
 }) => {
+  const { t, i18n } = useTranslation();
   const { showMenu, setShowMenu } = useResponsiveMenu();
   const { isFullscreen: headerIsFullscreen, setIsFullscreen: headerSetIsFullscreen } = useFullscreen() || {};
-  const word = lessons[currentLesson].words[currentWord];
-  const options = generateQuizOptions(word);
+  const totalWords = lessons[currentLesson].words.length;
+  const word = currentWord < totalWords ? lessons[currentLesson].words[currentWord] : null;
+  const options = word ? generateQuizOptions(word) : [];
+  let lessonTitle = lessons[currentLesson].title;
+  if (i18n.language === 'en') lessonTitle = lessons[currentLesson].title_en;
+  if (i18n.language === 'ja') lessonTitle = lessons[currentLesson].title_ja;
   
   const onMenuClick = (menuKey) => handleMenuClick(menuKey, setShowMenu, setGameState);
   
   return (
     <div className="h-screen flex flex-col font-inter relative overflow-hidden" style={{background: 'linear-gradient(135deg, #e0f7fa 0%, #f3e8ff 100%)'}}>
       <Header
-        title={`Kiểm tra - ${lessons[currentLesson].title}`}
+        title={`${t('quiz.title')} - ${lessonTitle}`}
         showMenu={showMenu}
         onMenuToggle={() => setShowMenu(show => !show)}
       />
@@ -54,18 +61,23 @@ const QuizScreen = ({
           </button>
         )}
         <div className="flex flex-col items-center justify-center p-6 sm:p-8 w-full max-w-4xl">
-          <QuizContent
-            word={word}
-            options={options}
-            currentWord={currentWord}
-            totalWords={lessons[currentLesson].words.length}
-            handleQuizAnswer={handleQuizAnswer}
-            selectedAnswer={selectedAnswer}
-            showResult={showResult}
-          />
+          
+            <QuizContent
+              word={word}
+              options={options}
+              currentWord={currentWord}
+              totalWords={totalWords}
+              handleQuizAnswer={handleQuizAnswer}
+              selectedAnswer={selectedAnswer}
+              showResult={showResult}
+              lives={lives}
+              resetGame={resetGame}
+            />
+          
         </div>
       </main>
       {/* Footer đã tự động ẩn khi fullscreen nhờ context */}
+      <Footer score={score} />
     </div>
   );
 };

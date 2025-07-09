@@ -69,8 +69,7 @@ const VowelConsonantScreen = ({ score, playSound, setGameState }) => {
             {items.map((item) => (
               <div key={item.key} className="group flex flex-col items-center z-20">
                 <h3 className="text-2xl md:text-3xl font-extrabold text-center mb-2 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent uppercase tracking-wider drop-shadow-lg" style={{fontFamily:'Baloo 2, Arial, sans-serif'}}>{item.label}</h3>
-                <p className="text-gray-600 text-center text-sm mb-2">{item.desc}</p>
-                <div className="flex flex-wrap justify-center gap-2 mt-2">
+                  <div className="flex flex-wrap justify-center gap-2 mt-2">
                   {item.letters.map((ch, idx) => {
                     const displayChar = isUpper ? ch : ch.toLowerCase();
                     const isClicked = clickedLetters.includes(displayChar);

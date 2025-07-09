@@ -3,8 +3,7 @@ import React, { useState, useEffect } from 'react';
 import MainScreen from './components/MainScreen.jsx';
 import LessonScreen from './components/LessonScreen.jsx';
 import QuizScreen from './components/QuizScreen.jsx';
-import CompleteScreen from './components/CompleteScreen.jsx';
-import GameOverScreen from './components/GameOverScreen.jsx';
+
 import TopicWordScreen from './components/TopicWordsScreen.jsx';
 import FlipGameScreen from './components/FlipGameScreen.jsx';
 import WordPuzzleGame from './components/WordPuzzleGame.tsx';
@@ -73,7 +72,7 @@ const VietnameseLearningApp = () => {
       if (currentWord < lessons[currentLesson].words.length - 1) {
         setCurrentWord(currentWord + 1);
       } else {
-        setGameState('complete');
+        setCurrentWord(currentWord + 1); // Đảm bảo currentWord = totalWords khi hoàn thành quiz
       }
     }, 2000);
   };
@@ -81,11 +80,10 @@ const VietnameseLearningApp = () => {
   // Reset game state
   const resetGame = () => {
     setCurrentWord(0);
-    //resetScore();
     setLives(3);
-    setGameState('main');
     setSelectedAnswer(null);
     setShowResult(false);
+    setGameState('quiz');
   };
 
   const handleSetGameState = (nextState) => {
@@ -104,9 +102,6 @@ const VietnameseLearningApp = () => {
   };
 
   // Game Over Screen
-  if (lives <= 0) {
-    return <GameOverScreen resetGame={resetGame} />;
-  }
 
   // Props object for all screens
   const screenProps = {
@@ -144,8 +139,7 @@ const VietnameseLearningApp = () => {
             return <LessonScreen {...screenProps} />;
           case 'quiz':
             return <QuizScreen {...screenProps} />;
-          case 'complete':
-            return <CompleteScreen {...screenProps} />;
+         
           case 'flipgame':
             return <FlipGameScreen {...screenProps} />;
           case 'puzzlegame':

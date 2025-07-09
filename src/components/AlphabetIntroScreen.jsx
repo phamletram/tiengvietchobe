@@ -64,7 +64,7 @@ const AlphabetIntroScreen = ({ setGameState, score }) => {
             >
               <div className="text-2xl sm:text-4xl md:text-5xl mb-2 sm:mb-4 text-center group-hover:animate-bounce-y">{item.icon}</div>
               <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 text-center mb-1">{item.label}</h3>
-              <p className="text-gray-600 text-center text-xs sm:text-sm">{item.desc}</p>
+              
             </button>
           ))}
         </div>

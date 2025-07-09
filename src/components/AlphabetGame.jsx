@@ -47,10 +47,14 @@ const AlphabetGame = ({ setGameState, score, setScore }) => {
   const [gameMode, setGameMode] = useState('learn'); // 'learn' or 'quiz'
   const [gameScore, setGameScore] = useState(0); // Local game score
   const [attempts, setAttempts] = useState(0);
+  const [correctAnswers, setCorrectAnswers] = useState(0);
+  const [wrongAnswers, setWrongAnswers] = useState(0);
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(null);
   const [quizOptions, setQuizOptions] = useState([]);
   const [currentQuiz, setCurrentQuiz] = useState(null);
+  const [usedLetters, setUsedLetters] = useState(new Set()); // Track used letters
+  const [quizCompleted, setQuizCompleted] = useState(false); // Track if quiz is completed
   const { showMenu, setShowMenu } = useResponsiveMenu();
   const { isFullscreen: headerIsFullscreen, setIsFullscreen: setHeaderIsFullscreen } = useFullscreen() || {};
 
@@ -101,12 +105,20 @@ const AlphabetGame = ({ setGameState, score, setScore }) => {
     }
   };
 
-  const generateQuiz = () => {
-    const randomLetter = vietnameseAlphabet[Math.floor(Math.random() * vietnameseAlphabet.length)];
-    const otherLetters = vietnameseAlphabet.filter(l => l.letter !== randomLetter.letter);
+  const generateQuiz = (usedLettersArg) => {
+    // Dùng usedLettersArg nếu có, không thì lấy từ state
+    const used = usedLettersArg || usedLetters;
+    const unusedLetters = vietnameseAlphabet.filter(l => !used.has(l.letter));
+    
+    if (unusedLetters.length === 0) {
+      setUsedLetters(new Set());
+      return;
+    }
+    const randomLetter = unusedLetters[Math.floor(Math.random() * unusedLetters.length)];
+    const allLetters = [...vietnameseAlphabet];
+    const otherLetters = allLetters.filter(l => l.letter !== randomLetter.letter);
     const shuffledOthers = otherLetters.sort(() => Math.random() - 0.5).slice(0, 3);
     const options = [...shuffledOthers, randomLetter].sort(() => Math.random() - 0.5);
-    
     setCurrentQuiz(randomLetter);
     setQuizOptions(options);
     setShowResult(false);
@@ -117,27 +129,42 @@ const AlphabetGame = ({ setGameState, score, setScore }) => {
     setGameMode('quiz');
     setGameScore(0); // Reset local game score
     setAttempts(0);
+    setCorrectAnswers(0);
+    setWrongAnswers(0);
+    setUsedLetters(new Set()); // Reset used letters
+    setQuizCompleted(false);
     generateQuiz();
   };
 
   const checkAnswer = (selectedLetter) => {
-    setAttempts(prev => prev + 1);
     const correct = selectedLetter.letter === currentQuiz.letter;
     setIsCorrect(correct);
     setShowResult(true);
-    
     if (correct) {
       playSound('correct');
       const pointsEarned = 10;
       setGameScore(prev => prev + pointsEarned);
-      setScore(score + pointsEarned); // Update global score
+      setScore(score + pointsEarned);
+      setCorrectAnswers(prev => prev + 1);
     } else {
       playSound('incorrect');
+      setWrongAnswers(prev => prev + 1);
     }
-    
-    setTimeout(() => {
-      generateQuiz();
-    }, 2000);
+    setUsedLetters(prev => {
+      const newSet = new Set([...prev, currentQuiz.letter]);
+      if (attempts + 1 < 29) {
+        setTimeout(() => {
+          generateQuiz(newSet);
+        }, 2000);
+      }
+      return newSet;
+    });
+    setAttempts(prev => prev + 1);
+    if (attempts + 1 >= 29) {
+      setTimeout(() => {
+        setQuizCompleted(true);
+      }, 2000);
+    }
   };
 
   const resetGame = () => {
@@ -145,8 +172,12 @@ const AlphabetGame = ({ setGameState, score, setScore }) => {
     setCurrentIndex(0);
     setGameScore(0); // Reset local game score
     setAttempts(0);
+    setCorrectAnswers(0);
+    setWrongAnswers(0);
     setShowResult(false);
     setIsCorrect(null);
+    setUsedLetters(new Set());
+    setQuizCompleted(false);
   };
 
   const onMenuClick = (menuKey) => {
@@ -201,9 +232,7 @@ const AlphabetGame = ({ setGameState, score, setScore }) => {
                     {currentLetter.smallLetter}
                   </div>
                 </div>
-                <div className="text-lg font-semibold text-gray-700 mb-2">
-                  {t('alphabet_game.pronunciation')}: {currentLetter.pronunciation}
-                </div>
+                
                 <div className="flex justify-center gap-4 mb-4">
                   <button onClick={prevLetter} disabled={currentIndex === 0} className="px-4 py-2 rounded-lg bg-blue-100 text-blue-700 font-bold disabled:opacity-50">
                     <ArrowLeft className="inline w-5 h-5 mr-1" />{t('alphabet_game.prev')}
@@ -224,7 +253,10 @@ const AlphabetGame = ({ setGameState, score, setScore }) => {
               <button onClick={startQuiz} className="bg-gradient-to-r from-blue-400 to-purple-500 text-white px-6 py-2 rounded-xl font-semibold hover:from-blue-500 hover:to-purple-600 transform hover:scale-105 transition-all duration-200 shadow-lg">
                 {t('alphabet_game.start_quiz')}
               </button>
-              <button onClick={resetGame} className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300">
+              <button onClick={resetGame} className="bg-gradient-to-r from-orange-400 to-red-500 text-white px-6 py-2 rounded-xl font-semibold hover:from-orange-500 hover:to-red-600 transform hover:scale-105 transition-all duration-200 shadow-lg flex items-center gap-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
                 {t('alphabet_game.reset')}
               </button>
             </div>
@@ -276,45 +308,61 @@ const AlphabetGame = ({ setGameState, score, setScore }) => {
                 <div className="bg-white px-2 py-1 sm:px-4 sm:py-2 rounded-lg shadow-md min-w-[64px] sm:min-w-[100px]">
                   <span className="font-semibold text-green-600 text-xs sm:text-base">{t('alphabet_game.score')}: {gameScore}</span>
                 </div>
-                <div className="bg-white px-2 py-1 sm:px-4 sm:py-2 rounded-lg shadow-md min-w-[64px] sm:min-w-[100px]">
-                  <span className="font-semibold text-blue-600 text-xs sm:text-base">{t('alphabet_game.attempts')}: {attempts}</span>
+                <div className="bg-white px-2 py-1 sm:px-4 sm:py-2 rounded-lg shadow-md min-w-[64px] sm:min-w-[100px] flex items-center justify-center">
+                  <span className="font-semibold text-blue-600 text-xs sm:text-base">{attempts} / 29</span>
                 </div>
               </div>
             </div>
 
             {/* Quiz Question */}
-            <div className="bg-white rounded-2xl shadow-xl p-12 mb-8">
-              <div className="text-center mb-8">
+            <div className="bg-white rounded-2xl shadow-xl p-8 pt-4 mb-8">
+              <div className="text-center mb-8 mt-0">
                 <h2 className="text-3xl font-bold text-gray-800 mb-4">
                   {t('alphabet_game.quiz_question_title')} <span className="text-purple-600">{currentQuiz?.example}</span>
                 </h2>
               </div>
 
               {/* Options */}
-              <div className="grid grid-cols-2 gap-4">
-                {quizOptions.map((option, index) => (
-                  <button
-                    key={index}
-                    onClick={() => checkAnswer(option)}
-                    disabled={showResult}
-                    className={`p-6 rounded-xl text-4xl font-bold transition-all duration-200 ${
-                      showResult
-                        ? option.letter === currentQuiz.letter
+              {!quizCompleted && !showResult && (
+                <div className="grid grid-cols-2 gap-4">
+                  {quizOptions.map((option, index) => (
+                    <button
+                      key={index}
+                      onClick={() => checkAnswer(option)}
+                      className="p-6 rounded-xl text-4xl font-bold transition-all duration-200 bg-blue-100 hover:bg-blue-200 text-blue-700 hover:scale-105"
+                    >
+                      <div className="flex justify-center items-center gap-2">
+                        <span>{option.letter}</span>
+                        <span className="text-2xl text-gray-500">{option.smallLetter}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Show result with correct answer highlighted */}
+              {!quizCompleted && showResult && (
+                <div className="grid grid-cols-2 gap-4">
+                  {quizOptions.map((option, index) => (
+                    <div
+                      key={index}
+                      className={`p-6 rounded-xl text-4xl font-bold ${
+                        option.letter === currentQuiz.letter
                           ? 'bg-green-100 border-2 border-green-400 text-green-700'
                           : 'bg-red-100 border-2 border-red-400 text-red-700'
-                        : 'bg-blue-100 hover:bg-blue-200 text-blue-700 hover:scale-105'
-                    }`}
-                  >
-                    <div className="flex justify-center items-center gap-2">
-                      <span>{option.letter}</span>
-                      <span className="text-2xl text-gray-500">{option.smallLetter}</span>
+                      }`}
+                    >
+                      <div className="flex justify-center items-center gap-2">
+                        <span>{option.letter}</span>
+                        <span className="text-2xl text-gray-500">{option.smallLetter}</span>
+                      </div>
                     </div>
-                  </button>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
 
               {/* Result */}
-              {showResult && (
+              {!quizCompleted && showResult && (
                 <div className="text-center mt-6">
                   {isCorrect ? (
                     <div className="flex items-center justify-center gap-2 text-green-600">
@@ -323,10 +371,34 @@ const AlphabetGame = ({ setGameState, score, setScore }) => {
                     </div>
                   ) : (
                     <div className="flex items-center justify-center gap-2 text-red-600">
-                      <XCircle className="w-8 h-8" />
-                      <span className="text-2xl font-bold">{t('alphabet_game.incorrect_feedback')}: {currentQuiz.letter}</span>
+                      <XCircle className="w-6 h-6 sm:w-8 sm:h-8" />
+                      <span className="text-lg sm:text-2xl font-bold">{t('alphabet_game.incorrect_feedback')}: {currentQuiz.letter}</span>
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* Quiz Completed Result */}
+              {quizCompleted && (
+                <div className="text-center mt-6">
+                  <h3 className="text-2xl font-bold text-gray-800 mb-4">{t('alphabet_game.quiz_completed_title')}</h3>
+                  <div className="flex justify-center gap-8 mb-4">
+                    <div className="text-center">
+                      <div className="text-4xl font-bold text-green-600">{correctAnswers}</div>
+                      <div className="text-sm text-gray-600">{t('alphabet_game.quiz_completed_correct')}</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-4xl font-bold text-red-600">{wrongAnswers}</div>
+                      <div className="text-sm text-gray-600">{t('alphabet_game.quiz_completed_wrong')}</div>
+                    </div>
+                  </div>
+                  
+                  <button 
+                    onClick={resetGame}
+                    className="bg-gradient-to-r from-blue-400 to-purple-500 text-white px-6 py-2 rounded-xl font-semibold hover:from-blue-500 hover:to-purple-600 transform hover:scale-105 transition-all duration-200 shadow-lg"
+                  >
+                    {t('alphabet_game.quiz_completed_play_again')}
+                  </button>
                 </div>
               )}
             </div>

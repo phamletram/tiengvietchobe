@@ -42,7 +42,7 @@ const Header = ({ title, showMenu, onMenuToggle, onBack }) => {
           <PanelLeftOpen className="w-7 h-7 text-white" />
         )}
       </button>
-      <h1 className="text-2xl md:text-3xl font-extrabold drop-shadow-lg leading-tight ml-2 text-white flex-1" style={{fontFamily:'Baloo 2, Arial, sans-serif'}}>
+      <h1 className="text-base sm:text-xl md:text-2xl md:text-3xl font-extrabold drop-shadow-lg leading-tight ml-2 text-white flex-1" style={{fontFamily:'Baloo 2, Arial, sans-serif'}}>
         {title}
       </h1>
       <div className='absolute left-0 bottom-0 w-full h-[2px] pointer-events-none'>

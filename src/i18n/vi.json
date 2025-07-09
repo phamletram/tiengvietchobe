@@ -17,7 +17,7 @@
   "alphabet_intro.vowel_consonant_desc": "Nguyên âm và phụ âm tiếng Việt",
   "alphabet_intro.sort_desc": "Kéo thả chữ cái vào đúng nhóm",
   "alphabet_game.title": "📝 Học chữ cái",
-  "alphabet_game.start_quiz": "Bắt đầu kiểm tra",
+  "alphabet_game.start_quiz": "Kiểm tra",
   "alphabet_game.back_to_learn": "Quay lại học",
   "alphabet_game.question": "Câu hỏi",
   "alphabet_game.correct_answer": "Đáp án đúng",
@@ -29,7 +29,7 @@
   "alphabet_game.reset": "Làm lại",
   "alphabet_game.prev": "Trước",
   "alphabet_game.next": "Sau",
-  "alphabet_game.listen": "Nghe phát âm",
+  "alphabet_game.listen": "Phát âm",
   "alphabet_game.example": "Ví dụ",
   "alphabet_game.meaning": "Nghĩa",
   "alphabet_game.choose_letter": "Chọn chữ cái đúng",
@@ -40,7 +40,15 @@
   "alphabet_game.learn_title": "Học chữ cái",
   "alphabet_game.quiz_question_title": "Chọn chữ cái bắt đầu của từ:",
   "alphabet_game.correct_feedback": "Chính xác! 🎉",
-  "alphabet_game.incorrect_feedback": "Sai rồi! Đáp án đúng là",
+  "alphabet_game.incorrect_feedback": "Sai rồi! Đúng là",
+  "alphabet_game.result_title": "Kết quả kiểm tra",
+  "alphabet_game.result_message": "Bạn đã trả lời đúng {correct} trên tổng số {total} chữ cái",
+  "alphabet_game.play_again": "Chơi lại",
+  "alphabet_game.back_to_menu": "Về menu",
+  "alphabet_game.quiz_completed_title": "Kết quả kiểm tra",
+  "alphabet_game.quiz_completed_correct": "Đúng",
+  "alphabet_game.quiz_completed_wrong": "Sai",
+  "alphabet_game.quiz_completed_play_again": "Chơi lại",
 
   "writing_game.title": "✍️ Tập viết chữ cái",
   "writing_game.prev": "Trước",
@@ -64,4 +72,21 @@
   "sort_game.correct": "Đúng rồi!",
   "sort_game.wrong": "Sai rồi!",
   "sort_game.all_correct": "Đúng tất cả rồi!"
-} 
+  ,
+  "topic.title": "Học từ vựng theo chủ đề",
+  "topic.words_count": "{{count}} từ vựng",
+  "lesson.prev": "Trước",
+  "lesson.next": "Tiếp",
+  "lesson.quiz": "Kiểm tra",
+  "lesson.progress": "{{current}} / {{total}} từ vựng"
+  ,
+  "quiz.title": "Kiểm tra",
+  "quiz.question": "Từ nào có nghĩa là: ",
+  "quiz.correct": "🎉 Đúng rồi!",
+  "quiz.incorrect": "😢 Sai rồi! Từ đúng là \"{{answer}}\".",
+  "quiz.progress": "Câu {{current}} / {{total}}"
+  ,
+  "gameover.title": "Hết Game!",
+  "gameover.desc": "Thử lại nhé!",
+  "gameover.retry": "Chơi lại"
+}
